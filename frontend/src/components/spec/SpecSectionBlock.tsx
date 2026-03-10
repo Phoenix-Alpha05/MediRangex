@@ -1,4 +1,4 @@
-import { SpecSection } from './specData';
+import type { SpecSection } from './specData';
 
 interface Props {
   section: SpecSection;
