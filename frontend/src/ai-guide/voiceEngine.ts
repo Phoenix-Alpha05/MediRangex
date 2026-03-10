@@ -26,18 +26,33 @@ interface WindowWithSR {
 
 let recognition: SpeechRecognitionLike | null = null;
 
-function pickVoice(profile: VoiceProfile): SpeechSynthesisVoice | null {
+function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
 
-  const preferred = profile === 'clinical'
-    ? ['George', 'Daniel', 'Alex', 'Google UK English Male', 'Google US English']
-    : ['Zira', 'Samantha', 'Karen', 'Google UK English Female', 'Google US English'];
+  const preferred = [
+    'Google UK English Female',
+    'Microsoft Hazel Desktop',
+    'Microsoft Hazel',
+    'Serena',
+    'Martha',
+    'Karen',
+    'Moira',
+  ];
 
   for (const name of preferred) {
     const v = voices.find(v => v.name.includes(name));
     if (v) return v;
   }
+
+  const ukFemale = voices.find(v => v.lang === 'en-GB' && /female|f\b/i.test(v.name));
+  if (ukFemale) return ukFemale;
+
+  const ukAny = voices.find(v => v.lang === 'en-GB');
+  if (ukAny) return ukAny;
+
+  const enFemale = voices.find(v => v.lang.startsWith('en') && /female|f\b/i.test(v.name));
+  if (enFemale) return enFemale;
 
   const en = voices.filter(v => v.lang.startsWith('en'));
   return en[0] ?? voices[0] ?? null;
@@ -49,8 +64,9 @@ export function speak(text: string, options: SpeakOptions): void {
   stopSpeaking();
 
   const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = options.profile === 'clinical' ? 0.88 : 0.95;
-  utt.pitch = options.profile === 'clinical' ? 0.95 : 1.05;
+  utt.lang = 'en-GB';
+  utt.rate = options.profile === 'clinical' ? 0.9 : 0.95;
+  utt.pitch = 1.1;
   utt.volume = 1;
 
   const setVoiceAndSpeak = () => {
@@ -125,7 +141,7 @@ export function startListening(
   stopListening();
 
   const rec = new SR();
-  rec.lang = 'en-US';
+  rec.lang = 'en-GB';
   rec.interimResults = false;
   rec.maxAlternatives = 1;
   rec.continuous = false;
