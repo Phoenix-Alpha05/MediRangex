@@ -95,13 +95,20 @@ export function useAIGuide() {
     setIsPaused(false);
 
     const step = steps[0];
-    setHighlightTarget(step.targetSelector ?? null);
+    setHighlightTarget(null);
     setHighlightColor(step.highlightColor ?? '#38bdf8');
 
-    speakText(step.script, () => {
-      setCurrentStepIndex(1);
+    const greeting = mode === 'clinical'
+      ? "Welcome. It's truly wonderful to have you here. I'm your AI clinical intelligence guide, and I must say — you've arrived at quite the right moment. Allow me to take you through MediRangeX, one of the most sophisticated real-time clinical intelligence platforms ever assembled. Shall we begin?"
+      : "Welcome, and thank you so very much for joining us today. It's a genuine pleasure to have you here. I'll be guiding you through MediRangeX — a platform that is quietly redefining what clinical intelligence looks like at enterprise scale. I think you'll find this rather illuminating.";
+
+    speakText(greeting, () => {
+      setHighlightTarget(step.targetSelector ?? null);
+      speakText(step.script, () => {
+        setCurrentStepIndex(1);
+      });
     });
-  }, [steps, speakText]);
+  }, [mode, steps, speakText]);
 
   const advanceStep = useCallback((index: number) => {
     if (index >= totalSteps) {
