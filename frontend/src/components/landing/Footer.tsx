@@ -82,8 +82,13 @@ export default function Footer() {
           paddingTop: '1.5rem',
           borderTop: '1px solid rgba(255,255,255,0.04)',
         }}>
-          <div style={{ fontSize: '0.75rem', color: '#2d3748' }}>
-            © 2026 MediRangeX. Clinical intelligence for modern healthcare.
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div style={{ fontSize: '0.75rem', color: '#2d3748' }}>
+              © 2026 RangeX Corp Private Limited. All rights reserved.
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#1e2a3a' }}>
+              MediRangeX&#8482; is a trademark of RangeX Corp Private Limited. Proprietary &amp; Confidential.
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             {['HIPAA', 'SOC 2', 'HL7 FHIR'].map(badge => (
