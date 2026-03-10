@@ -1,6 +1,7 @@
 import type { CommandDashboardResponse } from '../types/dashboard';
 
-const API_BASE = '/api/dashboard';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 const EMPTY_DASHBOARD: CommandDashboardResponse = {
   system_status: {
@@ -37,14 +38,17 @@ const EMPTY_DASHBOARD: CommandDashboardResponse = {
   generated_at: new Date().toISOString(),
 };
 
-export async function fetchCommandDashboard(token: string): Promise<CommandDashboardResponse> {
+export async function fetchCommandDashboard(_token: string): Promise<CommandDashboardResponse> {
   try {
-    const res = await fetch(`${API_BASE}/command-center`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/medirx-api`,
+      {
+        headers: {
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     if (!res.ok) {
       return { ...EMPTY_DASHBOARD, generated_at: new Date().toISOString() };
