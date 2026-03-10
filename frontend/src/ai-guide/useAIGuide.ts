@@ -99,8 +99,8 @@ export function useAIGuide() {
     setHighlightColor(step.highlightColor ?? '#38bdf8');
 
     const greeting = mode === 'clinical'
-      ? "Welcome. It's truly wonderful to have you here. I'm your AI clinical intelligence guide, and I must say — you've arrived at quite the right moment. Allow me to take you through MediRangeX, one of the most sophisticated real-time clinical intelligence platforms ever assembled. Shall we begin?"
-      : "Welcome, and thank you so very much for joining us today. It's a genuine pleasure to have you here. I'll be guiding you through MediRangeX — a platform that is quietly redefining what clinical intelligence looks like at enterprise scale. I think you'll find this rather illuminating.";
+      ? "Welcome. It's truly wonderful to have you here. I'm ARIA — your Adaptive Real-time Intelligence Assistant — and I must say, you've arrived at quite the right moment. Allow me to take you through MediRangeX, one of the most sophisticated real-time clinical intelligence platforms ever assembled. Shall we begin?"
+      : "Welcome, and thank you so very much for joining us today. It's a genuine pleasure to have you here. I'm ARIA — your Adaptive Real-time Intelligence Assistant. I'll be guiding you through MediRangeX — a platform that is quietly redefining what clinical intelligence looks like at enterprise scale. I think you'll find this rather illuminating.";
 
     speakText(greeting, () => {
       setHighlightTarget(step.targetSelector ?? null);

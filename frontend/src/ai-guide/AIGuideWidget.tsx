@@ -236,7 +236,7 @@ export function AIGuideWidget() {
                 <StatusDot status={guide.status} color={accentColor} />
                 <div>
                   <div style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: accentColor }}>
-                    {guide.status === 'speaking' ? 'Speaking' : guide.status === 'listening' ? 'Listening' : guide.status === 'paused' ? 'Paused' : 'AI Guide'}
+                    {guide.status === 'speaking' ? 'Speaking' : guide.status === 'listening' ? 'Listening' : guide.status === 'paused' ? 'Paused' : 'ARIA'}
                   </div>
                   <div style={{ fontSize: '9px', color: '#4e5f74', letterSpacing: '0.06em' }}>
                     {isClinical ? 'Clinical Intelligence' : 'Investor Overview'}
@@ -519,7 +519,7 @@ export function AIGuideWidget() {
               : 'none',
             transition: 'all 0.2s ease',
           }}
-          title={guide.isOpen ? 'Close AI Guide' : 'Open AI Guide'}
+          title={guide.isOpen ? 'Close ARIA' : 'Open ARIA'}
         >
           <OrbIcon status={guide.status} color={accentColor} />
         </button>
