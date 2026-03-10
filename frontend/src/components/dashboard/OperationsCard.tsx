@@ -39,6 +39,7 @@ export function OperationsCard({ data, onOpsRiskClick }: Props) {
       subtitle="Live"
       icon={<OpsIcon />}
       borderColor={hasAlerts ? '#ef4444' : undefined}
+      guideId="operations-card"
     >
       <div
         style={{

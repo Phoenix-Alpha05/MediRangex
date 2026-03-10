@@ -129,16 +129,18 @@ export function CommandCenter() {
       )}
 
       {data && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gridTemplateRows: '1fr 1fr',
-          gap: '1px',
-          flex: 1,
-          background: 'rgba(255,255,255,0.02)',
-          overflow: 'hidden',
-          minHeight: 0,
-        }}>
+        <div
+          data-guide="dashboard"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gridTemplateRows: '1fr 1fr',
+            gap: '1px',
+            flex: 1,
+            background: 'rgba(255,255,255,0.02)',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}>
           <ClinicalCard
             data={data.clinical}
             onHighRiskClick={() => setActiveView('highRisk')}

@@ -38,6 +38,7 @@ export function MLCard({ data, onMLClick }: Props) {
       subtitle={`v${data.active_model_version}`}
       icon={<MLIcon />}
       borderColor={data.drift_detected ? '#ef4444' : undefined}
+      guideId="ml-card"
     >
       <div
         style={{

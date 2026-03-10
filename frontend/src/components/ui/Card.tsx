@@ -8,11 +8,13 @@ interface CardProps {
   meta?: string;
   borderColor?: string;
   criticalPulse?: boolean;
+  guideId?: string;
 }
 
-export function Card({ title, subtitle, icon, children, meta, borderColor, criticalPulse }: CardProps) {
+export function Card({ title, subtitle, icon, children, meta, borderColor, criticalPulse, guideId }: CardProps) {
   return (
     <div
+      data-guide={guideId}
       style={{
         display: 'flex',
         flexDirection: 'column',

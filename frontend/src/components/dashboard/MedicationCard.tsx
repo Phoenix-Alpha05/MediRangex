@@ -45,6 +45,7 @@ export function MedicationCard({ data, onMedAlertsClick }: Props) {
       icon={<MedIcon />}
       borderColor={hasCritical ? '#f59e0b' : undefined}
       criticalPulse={hasCritical}
+      guideId="medication-card"
     >
       <div
         style={{ display: 'flex', gap: '0', marginBottom: '10px', ...clickableStyle }}

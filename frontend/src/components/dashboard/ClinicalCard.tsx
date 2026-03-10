@@ -44,6 +44,7 @@ export function ClinicalCard({ data, onHighRiskClick, onAlertsClick }: Props) {
       icon={<ClinicalIcon />}
       borderColor={hasHighRisk ? '#ef4444' : undefined}
       criticalPulse={hasHighRisk}
+      guideId="clinical-card"
     >
       <div style={{ display: 'flex', gap: '0', marginBottom: '10px' }}>
         <Tooltip content="Click to view high-risk patients">
