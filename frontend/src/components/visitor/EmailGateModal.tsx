@@ -156,20 +156,15 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
               </div>
             </div>
 
-            <div className="mrx-copy-1" style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+            <div className="mrx-copy-1" style={{ textAlign: 'center', marginBottom: '0.75rem' }}>
               <span style={{
-                display: 'inline-block',
-                padding: '3px 12px',
-                borderRadius: '20px',
-                background: 'rgba(56,189,248,0.07)',
-                border: '1px solid rgba(56,189,248,0.18)',
-                fontSize: '0.65rem',
+                fontSize: '0.62rem',
                 fontWeight: 700,
-                color: '#7dd3fc',
-                letterSpacing: '0.14em',
+                color: '#475569',
+                letterSpacing: '0.16em',
                 textTransform: 'uppercase',
               }}>
-                Welcome — Exclusive Live Preview
+                Rangex Corp Private Limited
               </span>
             </div>
 
@@ -185,7 +180,7 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}>
-                A new standard of clinical<br />intelligence awaits you.
+                Welcome to MediRangeX™
               </h2>
             </div>
 
@@ -201,9 +196,7 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 lineHeight: 1.75,
                 fontWeight: 400,
               }}>
-                You are about to step into MediRangeX — where real-time patient intelligence,
-                predictive AI, and advanced clinical reasoning converge into one powerful command environment.
-                Trusted by the most forward-thinking leaders in modern healthcare.
+                Clinical Intelligence AI Platform — an enterprise-grade decision support system crafted for modern health systems and clinical leaders.
               </p>
             </div>
 
@@ -213,12 +206,22 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 fontSize: '0.68rem',
                 fontWeight: 700,
                 color: '#334155',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                marginBottom: '0.5rem',
+                marginBottom: '0.35rem',
+                textAlign: 'center',
               }}>
-                Your Institutional Email
+                Exclusive Access
               </label>
+              <p style={{
+                fontSize: '0.78rem',
+                color: '#475569',
+                margin: '0 0 0.85rem',
+                lineHeight: 1.6,
+                textAlign: 'center',
+              }}>
+                Please enter your email to proceed. Your access will be logged for security purposes.
+              </p>
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <input
                   className="mrx-input"
@@ -278,7 +281,7 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                     fontFamily: 'inherit',
                   }}
                 >
-                  {formState === 'submitting' ? 'Verifying...' : 'Proceed to MediRangeX'}
+                  {formState === 'submitting' ? 'Verifying...' : 'Enter Platform'}
                 </button>
               </form>
             </div>
@@ -293,13 +296,14 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
               <p style={{
-                fontSize: '0.68rem',
+                fontSize: '0.62rem',
                 color: '#1e293b',
                 margin: 0,
                 lineHeight: 1.5,
-                letterSpacing: '0.01em',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
               }}>
-                This is a live demonstration environment. Your identity is used solely for access verification and is never shared.
+                Confidential · Proprietary Technology · © 2026 Rangex Corp
               </p>
             </div>
           </div>
