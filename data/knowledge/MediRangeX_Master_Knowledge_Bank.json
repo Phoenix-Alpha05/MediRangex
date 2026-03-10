@@ -1,0 +1,146 @@
+{
+  "knowledge_bank": {
+    "name": "MediRangeX_Master_Knowledge_Bank",
+    "version": "1.0",
+    "platform": "Bolt_AI",
+    "modules": [
+      {
+        "module": "clinical_protocols_sepsis",
+        "version": "1.0",
+        "domain": "clinical_guidelines",
+        "payload_ref": "MODULE_1_SEPSIS_PROTOCOLS"
+      },
+      {
+        "module": "clinical_risk_feature_store",
+        "version": "1.0",
+        "domain": "predictive_modeling",
+        "payload_ref": "MODULE_2_FEATURE_STORE"
+      },
+      {
+        "module": "drug_safety_knowledge_base",
+        "version": "1.0",
+        "domain": "pharmacology",
+        "payload_ref": "MODULE_3_DRUG_SAFETY"
+      },
+      {
+        "module": "hospital_operations_forecasting",
+        "version": "1.0",
+        "domain": "healthcare_operations",
+        "payload_ref": "MODULE_4_OPERATIONS_FORECASTING"
+      },
+      {
+        "module": "medical_ontology_mapping",
+        "version": "1.0",
+        "domain": "healthcare_interoperability",
+        "payload_ref": "MODULE_5_ONTOLOGY_MAPPING"
+      },
+      {
+        "module": "clinical_knowledge_graph",
+        "version": "1.0",
+        "domain": "clinical_reasoning",
+        "payload_ref": "MODULE_6_KNOWLEDGE_GRAPH"
+      }
+    ],
+    "cross_module_links": [
+      {
+        "from": "clinical_risk_feature_store",
+        "to": "clinical_protocols_sepsis",
+        "link_type": "model_targets_defined_by_guidelines"
+      },
+      {
+        "from": "clinical_risk_feature_store",
+        "to": "medical_ontology_mapping",
+        "link_type": "feature_code_standardization"
+      },
+      {
+        "from": "drug_safety_knowledge_base",
+        "to": "clinical_knowledge_graph",
+        "link_type": "drug_interaction_edges"
+      },
+      {
+        "from": "clinical_knowledge_graph",
+        "to": "clinical_protocols_sepsis",
+        "link_type": "causal_pathways_and_alert_logic"
+      },
+      {
+        "from": "hospital_operations_forecasting",
+        "to": "clinical_risk_feature_store",
+        "link_type": "capacity_signals_affect_risk_models"
+      },
+      {
+        "from": "medical_ontology_mapping",
+        "to": "clinical_knowledge_graph",
+        "link_type": "entity_normalization_layer"
+      }
+    ],
+    "rag_index_structure": {
+      "index_layers": [
+        {
+          "layer": "guidelines",
+          "sources": ["clinical_protocols_sepsis"]
+        },
+        {
+          "layer": "drug_safety",
+          "sources": ["drug_safety_knowledge_base"]
+        },
+        {
+          "layer": "operations",
+          "sources": ["hospital_operations_forecasting"]
+        },
+        {
+          "layer": "terminology",
+          "sources": ["medical_ontology_mapping"]
+        }
+      ],
+      "embedding_strategy": {
+        "clinical_text": "sentence_transformer_medical",
+        "structured_data": "schema_aware_embeddings",
+        "graph": "node2vec_or_graphsage"
+      }
+    },
+    "graph_database_seed": {
+      "source_module": "clinical_knowledge_graph",
+      "node_types": "entity_types",
+      "edge_types": "relationship_types",
+      "logic_layers": [
+        "causal_paths",
+        "alert_logic_patterns",
+        "temporal_relationships"
+      ]
+    },
+    "api_contracts": {
+      "risk_prediction_api": {
+        "input": "clinical_risk_feature_store",
+        "outputs": ["sepsis_risk","deterioration_risk","shock_risk"]
+      },
+      "drug_safety_api": {
+        "input": ["active_medications","labs","diagnoses"],
+        "outputs": ["interaction_alerts","contraindication_alerts","dose_adjustments"]
+      },
+      "operations_forecast_api": {
+        "input": ["admissions","discharges","bed_state","staffing"],
+        "outputs": ["icu_forecast","ed_congestion_forecast","capacity_alerts"]
+      },
+      "terminology_api": {
+        "input": "local_clinical_codes",
+        "outputs": ["standardized_codes","concept_mappings"]
+      },
+      "clinical_reasoning_api": {
+        "input": ["patient_state","events","medications"],
+        "outputs": ["causal_paths","risk_explanations","recommended_actions"]
+      }
+    },
+    "ingestion_notes": {
+      "format": "json",
+      "mode": "bulk_upload",
+      "ordering": [
+        "medical_ontology_mapping",
+        "clinical_knowledge_graph",
+        "clinical_protocols_sepsis",
+        "drug_safety_knowledge_base",
+        "clinical_risk_feature_store",
+        "hospital_operations_forecasting"
+      ]
+    }
+  }
+}
