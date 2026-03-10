@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SPEC_SECTIONS } from '../spec/specData';
 
 const TERMINAL_LINES = [
   { text: '> Initializing MediRangeX Clinical Intelligence...', color: '#94a3b8', delay: 0 },
@@ -18,6 +19,8 @@ const LIVE_STATS = [
   { label: 'Alert Accuracy', value: 97.3, suffix: '%', color: '#f59e0b', decimal: true },
   { label: 'Response Time', value: 43, suffix: 'ms', color: '#818cf8' },
 ];
+
+const OVERVIEW = SPEC_SECTIONS[0];
 
 function AnimatedNumber({ target, decimal }: { target: number; decimal?: boolean }) {
   const [current, setCurrent] = useState(0);
@@ -151,8 +154,155 @@ function RuntimeBanner() {
   );
 }
 
+function AboutPanel() {
+  const mission = OVERVIEW.subsections.find(s => s.title === 'Mission');
+  const vision = OVERVIEW.subsections.find(s => s.title === 'Vision');
+  const problem = OVERVIEW.subsections.find(s => s.title === 'Core Problem Statement');
+  const users = OVERVIEW.subsections.find(s => s.title === 'Target Users');
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '4rem',
+      alignItems: 'start',
+      animation: 'fade-up 0.4s ease forwards',
+    }}>
+      <div>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <span className="tag tag-cyan">
+            <span className="status-dot" style={{ width: 5, height: 5 }} />
+            Platform Overview
+          </span>
+        </div>
+
+        <h2 style={{
+          fontSize: 'clamp(1.8rem, 3vw, 2.75rem)',
+          fontWeight: 900,
+          lineHeight: 1.1,
+          letterSpacing: '-0.03em',
+          margin: '0 0 1.25rem',
+          color: '#f0f4ff',
+        }}>
+          Built for Health Systems<br />
+          <span className="text-gradient-cyan">Under Pressure</span>
+        </h2>
+
+        <p style={{
+          fontSize: '0.95rem',
+          lineHeight: 1.75,
+          color: '#94a3b8',
+          margin: '0 0 2rem',
+        }}>
+          {OVERVIEW.intro}
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {mission && (
+            <div style={{
+              background: 'rgba(12,17,32,0.8)',
+              border: '1px solid rgba(56,189,248,0.1)',
+              borderLeft: '3px solid #38bdf8',
+              borderRadius: '0 0.5rem 0.5rem 0',
+              padding: '1rem 1.25rem',
+            }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#38bdf8', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                Mission
+              </div>
+              <p style={{ fontSize: '0.875rem', color: '#cbd5e1', lineHeight: 1.65, margin: 0 }}>
+                {mission.body}
+              </p>
+            </div>
+          )}
+          {vision && (
+            <div style={{
+              background: 'rgba(12,17,32,0.8)',
+              border: '1px solid rgba(16,185,129,0.1)',
+              borderLeft: '3px solid #10b981',
+              borderRadius: '0 0.5rem 0.5rem 0',
+              padding: '1rem 1.25rem',
+            }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#10b981', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                Vision
+              </div>
+              <p style={{ fontSize: '0.875rem', color: '#cbd5e1', lineHeight: 1.65, margin: 0 }}>
+                {vision.body}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {problem && problem.items && (
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+              Core Problem Statement
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+              {problem.items.map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  gap: '0.75rem',
+                  alignItems: 'flex-start',
+                  padding: '0.75rem',
+                  background: 'rgba(8,12,20,0.6)',
+                  border: '1px solid rgba(255,255,255,0.04)',
+                  borderRadius: '0.5rem',
+                }}>
+                  <span style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: 'rgba(244,63,94,0.1)',
+                    border: '1px solid rgba(244,63,94,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    marginTop: 1,
+                  }}>
+                    <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 2v4M6 9h.01" stroke="#f43f5e" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.55 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {users && users.tags && (
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
+              Target Users
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {users.tags.map((tag, i) => (
+                <span key={i} style={{
+                  fontSize: '0.72rem',
+                  padding: '0.3rem 0.65rem',
+                  background: 'rgba(56,189,248,0.06)',
+                  border: '1px solid rgba(56,189,248,0.12)',
+                  borderRadius: '9999px',
+                  color: '#94a3b8',
+                  fontWeight: 500,
+                }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function HeroSection() {
   const [lastLine, setLastLine] = useState(false);
+  const [activeTab, setActiveTab] = useState<'platform' | 'about'>('platform');
   const navigate = useNavigate();
 
   const scrollTo = useCallback((id: string) => {
@@ -216,235 +366,274 @@ export default function HeroSection() {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', width: '100%' }}>
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '4rem',
-          alignItems: 'center',
+          display: 'flex',
+          gap: '0.25rem',
+          marginBottom: '2.5rem',
+          background: 'rgba(5,8,16,0.6)',
+          border: '1px solid rgba(56,189,248,0.1)',
+          borderRadius: '0.625rem',
+          padding: '0.25rem',
+          width: 'fit-content',
+          animation: 'fade-up 0.5s ease forwards',
         }}>
-          <div>
-            <div style={{ marginBottom: '1.5rem', animation: 'fade-up 0.6s ease forwards' }}>
-              <span className="tag tag-cyan">
-                <span className="status-dot" style={{ width: 5, height: 5 }} />
-                Clinical AI Platform
-              </span>
-            </div>
-
-            <h1 style={{
-              fontSize: 'clamp(2.5rem, 4vw, 3.75rem)',
-              fontWeight: 900,
-              lineHeight: 1.1,
-              letterSpacing: '-0.03em',
-              margin: '0 0 1.5rem',
-              animation: 'fade-up 0.6s ease 0.1s both',
-            }}>
-              <span style={{ color: '#f0f4ff' }}>Hospital Intelligence</span>
-              <br />
-              <span className="text-gradient-cyan">at the Speed of Care</span>
-            </h1>
-
-            <p style={{
-              fontSize: '1.05rem',
-              lineHeight: 1.7,
-              color: '#94a3b8',
-              maxWidth: 520,
-              margin: '0 0 1.5rem',
-              animation: 'fade-up 0.6s ease 0.2s both',
-            }}>
-              MediRangeX integrates real-time sepsis prediction, drug safety intelligence,
-              operations forecasting, and ML model observability into a single unified
-              command center — purpose-built for modern clinical environments.
-            </p>
-
-            <div style={{ animation: 'fade-up 0.6s ease 0.25s both', marginBottom: '1.75rem' }}>
-              <RuntimeBanner />
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '0.75rem',
-              marginBottom: '3rem',
-              flexWrap: 'wrap',
-              animation: 'fade-up 0.6s ease 0.3s both',
-            }}>
-              <button className="btn-primary" onClick={() => navigate('/dashboard/command-center')}>
-                View Dashboard
-                <span style={{ marginLeft: '0.4rem' }}>→</span>
-              </button>
-              <button className="btn-demo" onClick={() => scrollTo('clinical-demo')}>
-                <span style={{ marginRight: '0.4rem' }}>▶</span>
-                Live Clinical Demo
-              </button>
-              <button className="btn-ghost" onClick={() => scrollTo('architecture')}>
-                View Architecture
-              </button>
-            </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '1rem',
-              animation: 'fade-up 0.6s ease 0.4s both',
-            }}>
-              {LIVE_STATS.map((stat) => (
-                <div key={stat.label} style={{
-                  background: 'rgba(12,17,32,0.8)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '0.75rem',
-                  padding: '1rem 1.25rem',
-                  transition: 'all 0.3s ease',
-                }}>
-                  <div style={{
-                    fontSize: '1.6rem',
-                    fontWeight: 700,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: stat.color,
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.2,
-                  }}>
-                    <AnimatedNumber target={stat.value} decimal={stat.decimal} />
-                    <span style={{ fontSize: '0.9rem' }}>{stat.suffix}</span>
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: '0.2rem', fontWeight: 500 }}>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ animation: 'fade-up 0.7s ease 0.2s both' }}>
-            <div
-              className="scan-line"
+          {(['platform', 'about'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
               style={{
-                background: '#080c14',
-                border: '1px solid rgba(56,189,248,0.15)',
-                borderRadius: '1rem',
-                overflow: 'hidden',
-                boxShadow: '0 0 60px rgba(56,189,248,0.06), 0 30px 80px rgba(0,0,0,0.4)',
+                padding: '0.5rem 1.5rem',
+                borderRadius: '0.4rem',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                letterSpacing: '0.02em',
+                transition: 'all 0.2s ease',
+                background: activeTab === tab ? 'rgba(56,189,248,0.12)' : 'transparent',
+                color: activeTab === tab ? '#38bdf8' : '#475569',
+                boxShadow: activeTab === tab ? 'inset 0 0 0 1px rgba(56,189,248,0.2)' : 'none',
+                textTransform: 'capitalize',
               }}
             >
-              <div style={{
-                padding: '0.75rem 1rem',
-                background: 'rgba(5,8,16,0.8)',
-                borderBottom: '1px solid rgba(56,189,248,0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-                <span style={{ marginLeft: '0.75rem', fontSize: '0.72rem', color: '#475569', fontFamily: 'monospace' }}>
-                  medirx-intelligence v2.4.1 — clinical runtime
+              {tab === 'platform' ? 'Platform' : 'About'}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'platform' ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '4rem',
+            alignItems: 'center',
+          }}>
+            <div>
+              <div style={{ marginBottom: '1.5rem', animation: 'fade-up 0.6s ease forwards' }}>
+                <span className="tag tag-cyan">
+                  <span className="status-dot" style={{ width: 5, height: 5 }} />
+                  Clinical AI Platform
                 </span>
               </div>
 
-              <div style={{ padding: '1.25rem', minHeight: 280, display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
-                {TERMINAL_LINES.map((line, i) => (
-                  <TerminalLine key={i} text={line.text} color={line.color} index={i} />
-                ))}
-                {lastLine && (
-                  <div style={{
-                    display: 'flex',
-                    gap: '0.5rem',
-                    fontSize: '0.72rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: '#38bdf8',
-                    marginTop: '0.4rem',
-                  }}>
-                    <span>$</span>
-                    <span className="animate-blink" style={{ borderRight: '2px solid #38bdf8', paddingRight: 2 }} />
-                  </div>
-                )}
+              <h1 style={{
+                fontSize: 'clamp(2.5rem, 4vw, 3.75rem)',
+                fontWeight: 900,
+                lineHeight: 1.1,
+                letterSpacing: '-0.03em',
+                margin: '0 0 1.5rem',
+                animation: 'fade-up 0.6s ease 0.1s both',
+              }}>
+                <span style={{ color: '#f0f4ff' }}>Hospital Intelligence</span>
+                <br />
+                <span className="text-gradient-cyan">at the Speed of Care</span>
+              </h1>
+
+              <p style={{
+                fontSize: '1.05rem',
+                lineHeight: 1.7,
+                color: '#94a3b8',
+                maxWidth: 520,
+                margin: '0 0 1.5rem',
+                animation: 'fade-up 0.6s ease 0.2s both',
+              }}>
+                MediRangeX integrates real-time sepsis prediction, drug safety intelligence,
+                operations forecasting, and ML model observability into a single unified
+                command center — purpose-built for modern clinical environments.
+              </p>
+
+              <div style={{ animation: 'fade-up 0.6s ease 0.25s both', marginBottom: '1.75rem' }}>
+                <RuntimeBanner />
               </div>
 
               <div style={{
-                padding: '0.75rem 1.25rem',
-                borderTop: '1px solid rgba(56,189,248,0.08)',
                 display: 'flex',
-                gap: '1.5rem',
-                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '3rem',
+                flexWrap: 'wrap',
+                animation: 'fade-up 0.6s ease 0.3s both',
               }}>
-                {[
-                  { label: 'SEPSIS ENGINE', status: 'ONLINE', color: '#10b981' },
-                  { label: 'DRUG SAFETY', status: 'ONLINE', color: '#10b981' },
-                  { label: 'OPS ML', status: 'ONLINE', color: '#10b981' },
-                  { label: 'DRIFT MONITOR', status: 'NORMAL', color: '#38bdf8' },
-                ].map((s) => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <button className="btn-primary" onClick={() => navigate('/dashboard/command-center')}>
+                  View Dashboard
+                  <span style={{ marginLeft: '0.4rem' }}>→</span>
+                </button>
+                <button className="btn-demo" onClick={() => scrollTo('clinical-demo')}>
+                  <span style={{ marginRight: '0.4rem' }}>▶</span>
+                  Live Clinical Demo
+                </button>
+                <button className="btn-ghost" onClick={() => scrollTo('architecture')}>
+                  View Architecture
+                </button>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '1rem',
+                animation: 'fade-up 0.6s ease 0.4s both',
+              }}>
+                {LIVE_STATS.map((stat) => (
+                  <div key={stat.label} style={{
+                    background: 'rgba(12,17,32,0.8)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '0.75rem',
+                    padding: '1rem 1.25rem',
+                    transition: 'all 0.3s ease',
+                  }}>
                     <div style={{
-                      width: 5,
-                      height: 5,
-                      borderRadius: '50%',
-                      background: s.color,
-                      boxShadow: `0 0 6px ${s.color}`,
-                      flexShrink: 0,
-                    }} />
-                    <span style={{ fontSize: '0.6rem', color: '#475569', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
-                      {s.label}
-                    </span>
+                      fontSize: '1.6rem',
+                      fontWeight: 700,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color: stat.color,
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.2,
+                    }}>
+                      <AnimatedNumber target={stat.value} decimal={stat.decimal} />
+                      <span style={{ fontSize: '0.9rem' }}>{stat.suffix}</span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: '0.2rem', fontWeight: 500 }}>
+                      {stat.label}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '0.75rem',
-              marginTop: '0.75rem',
-            }}>
-              {[
-                { label: 'ICU Occupancy', value: '74%', trend: '+3%', trendUp: true, bar: 74, color: '#38bdf8' },
-                { label: 'ED Congestion Risk', value: 'MODERATE', badge: true, color: '#f59e0b' },
-                { label: 'Active Patients', value: '247', sub: '12 critical', color: '#10b981' },
-                { label: 'Drug Alerts (24h)', value: '18', sub: '3 critical', color: '#f43f5e' },
-              ].map((item) => (
-                <div key={item.label} style={{
-                  background: 'rgba(8,12,20,0.8)',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  borderRadius: '0.625rem',
-                  padding: '0.875rem',
-                  transition: 'border-color 0.2s ease',
+            <div style={{ animation: 'fade-up 0.7s ease 0.2s both' }}>
+              <div
+                className="scan-line"
+                style={{
+                  background: '#080c14',
+                  border: '1px solid rgba(56,189,248,0.15)',
+                  borderRadius: '1rem',
+                  overflow: 'hidden',
+                  boxShadow: '0 0 60px rgba(56,189,248,0.06), 0 30px 80px rgba(0,0,0,0.4)',
                 }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(56,189,248,0.15)')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)')}
-                >
-                  <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {item.label}
-                  </div>
-                  <div style={{
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: item.color,
-                  }}>
-                    {item.value}
-                  </div>
-                  {item.sub && (
-                    <div style={{ fontSize: '0.65rem', color: '#475569', marginTop: '0.2rem' }}>{item.sub}</div>
-                  )}
-                  {item.trend && (
-                    <div style={{ fontSize: '0.65rem', color: item.trendUp ? '#f59e0b' : '#10b981', marginTop: '0.2rem' }}>
-                      {item.trend} from last hour
-                    </div>
-                  )}
-                  {item.bar !== undefined && (
-                    <div style={{ marginTop: '0.5rem', height: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
-                      <div style={{
-                        height: '100%',
-                        width: `${item.bar}%`,
-                        background: item.color,
-                        borderRadius: 2,
-                        boxShadow: `0 0 8px ${item.color}`,
-                      }} />
+              >
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(5,8,16,0.8)',
+                  borderBottom: '1px solid rgba(56,189,248,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
+                  <span style={{ marginLeft: '0.75rem', fontSize: '0.72rem', color: '#475569', fontFamily: 'monospace' }}>
+                    medirx-intelligence v2.4.1 — clinical runtime
+                  </span>
+                </div>
+
+                <div style={{ padding: '1.25rem', minHeight: 280, display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+                  {TERMINAL_LINES.map((line, i) => (
+                    <TerminalLine key={i} text={line.text} color={line.color} index={i} />
+                  ))}
+                  {lastLine && (
+                    <div style={{
+                      display: 'flex',
+                      gap: '0.5rem',
+                      fontSize: '0.72rem',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color: '#38bdf8',
+                      marginTop: '0.4rem',
+                    }}>
+                      <span>$</span>
+                      <span className="animate-blink" style={{ borderRight: '2px solid #38bdf8', paddingRight: 2 }} />
                     </div>
                   )}
                 </div>
-              ))}
+
+                <div style={{
+                  padding: '0.75rem 1.25rem',
+                  borderTop: '1px solid rgba(56,189,248,0.08)',
+                  display: 'flex',
+                  gap: '1.5rem',
+                  alignItems: 'center',
+                }}>
+                  {[
+                    { label: 'SEPSIS ENGINE', status: 'ONLINE', color: '#10b981' },
+                    { label: 'DRUG SAFETY', status: 'ONLINE', color: '#10b981' },
+                    { label: 'OPS ML', status: 'ONLINE', color: '#10b981' },
+                    { label: 'DRIFT MONITOR', status: 'NORMAL', color: '#38bdf8' },
+                  ].map((s) => (
+                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <div style={{
+                        width: 5,
+                        height: 5,
+                        borderRadius: '50%',
+                        background: s.color,
+                        boxShadow: `0 0 6px ${s.color}`,
+                        flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: '0.6rem', color: '#475569', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+                        {s.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '0.75rem',
+                marginTop: '0.75rem',
+              }}>
+                {[
+                  { label: 'ICU Occupancy', value: '74%', trend: '+3%', trendUp: true, bar: 74, color: '#38bdf8' },
+                  { label: 'ED Congestion Risk', value: 'MODERATE', badge: true, color: '#f59e0b' },
+                  { label: 'Active Patients', value: '247', sub: '12 critical', color: '#10b981' },
+                  { label: 'Drug Alerts (24h)', value: '18', sub: '3 critical', color: '#f43f5e' },
+                ].map((item) => (
+                  <div key={item.label} style={{
+                    background: 'rgba(8,12,20,0.8)',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                    borderRadius: '0.625rem',
+                    padding: '0.875rem',
+                    transition: 'border-color 0.2s ease',
+                  }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(56,189,248,0.15)')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)')}
+                  >
+                    <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {item.label}
+                    </div>
+                    <div style={{
+                      fontSize: '1rem',
+                      fontWeight: 700,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color: item.color,
+                    }}>
+                      {item.value}
+                    </div>
+                    {item.sub && (
+                      <div style={{ fontSize: '0.65rem', color: '#475569', marginTop: '0.2rem' }}>{item.sub}</div>
+                    )}
+                    {item.trend && (
+                      <div style={{ fontSize: '0.65rem', color: item.trendUp ? '#f59e0b' : '#10b981', marginTop: '0.2rem' }}>
+                        {item.trend} from last hour
+                      </div>
+                    )}
+                    {item.bar !== undefined && (
+                      <div style={{ marginTop: '0.5rem', height: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+                        <div style={{
+                          height: '100%',
+                          width: `${item.bar}%`,
+                          background: item.color,
+                          borderRadius: 2,
+                          boxShadow: `0 0 8px ${item.color}`,
+                        }} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <AboutPanel />
+        )}
       </div>
 
       <div

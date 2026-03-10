@@ -7,6 +7,7 @@ import ClinicalDemoSection from '../components/landing/ClinicalDemoSection';
 import ArchitectureSection from '../components/landing/ArchitectureSection';
 import MetricsSection from '../components/landing/MetricsSection';
 import CTASection from '../components/landing/CTASection';
+import ResourcesSection from '../components/landing/ResourcesSection';
 import Footer from '../components/landing/Footer';
 import RequestAccessModal from '../components/landing/RequestAccessModal';
 
@@ -30,6 +31,8 @@ export default function LandingPage() {
       <ArchitectureSection />
       <div className="section-divider" />
       <MetricsSection />
+      <div className="section-divider" />
+      <ResourcesSection />
       <div className="section-divider" />
       <CTASection onRequestAccess={openAccessModal} />
       <Footer />
