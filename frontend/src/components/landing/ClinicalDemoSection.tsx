@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { speak, stopSpeaking, isTTSSupported } from '../../ai-guide/voiceEngine';
 
 interface DemoStep {
   time: string;
@@ -11,6 +12,7 @@ interface DemoStep {
   phase: string;
   vitals: { hr: number; rr: number; sbp: number; temp: number; lactate?: number };
   narrative: string;
+  voiceScript: string;
   panel: 'clinical' | 'medication' | 'operations' | 'command';
   activePanel?: string;
   triggeredFactors: string[];
@@ -31,9 +33,9 @@ const STEPS: DemoStep[] = [
     phase: 'BASELINE',
     vitals: { hr: 76, rr: 14, sbp: 122, temp: 37.0 },
     narrative: 'Patient stable. Continuous monitoring active. All vitals within normal parameters.',
+    voiceScript: 'Patient MRX-ICU-0427, John D., 64 years old, admitted to ICU Bay 3. All vital signs are within normal parameters. Heart rate 76 beats per minute. Respiratory rate 14. Systolic blood pressure 122. Risk score is 2 out of 12 — low risk. Continuous monitoring is active across all physiological channels.',
     panel: 'clinical',
     triggeredFactors: [],
-    actions: undefined,
   },
   {
     time: 'T+8s',
@@ -45,9 +47,9 @@ const STEPS: DemoStep[] = [
     phase: 'EARLY_SHIFT',
     vitals: { hr: 101, rr: 21, sbp: 112, temp: 38.2 },
     narrative: 'Subtle deterioration detected before visible symptoms. SIRS criteria triggered.',
+    voiceScript: 'Subtle physiological changes are emerging. Heart rate has risen to 101 beats per minute. Respiratory rate is now 21. Temperature has elevated to 38.2 degrees Celsius. The system has detected 3 of 4 SIRS criteria, pushing the risk score to 4 — moderate range. This early pattern of systemic inflammation would not yet trigger a standard clinical alert. MediRangeX is already watching.',
     panel: 'clinical',
     triggeredFactors: ['HR > 90 bpm', 'RR > 20/min', 'Temp > 38.0°C'],
-    actions: undefined,
     warning: 'SIRS Criteria: 3/4 met',
   },
   {
@@ -60,6 +62,7 @@ const STEPS: DemoStep[] = [
     phase: 'HYPOPERFUSION',
     vitals: { hr: 124, rr: 26, sbp: 88, temp: 38.9, lactate: 2.8 },
     narrative: 'Perfusion failure suspected. Early sepsis likely. Hypoperfusion rules firing.',
+    voiceScript: 'A critical perfusion signal has been detected. Systolic blood pressure has dropped to 88 millimeters of mercury. Lactate is now elevated at 2.8 millimoles per liter — a key biochemical marker of tissue hypoperfusion. Risk score has risen to 7, placing this patient firmly in the high-risk category. The sepsis engine is identifying a pattern consistent with early distributive shock. Immediate clinical review is now recommended.',
     panel: 'clinical',
     triggeredFactors: ['HR > 90 bpm', 'SBP < 90 mmHg', 'Lactate > 2 mmol/L', 'RR > 20/min', 'Temp > 38.0°C'],
     warning: 'Hypoperfusion Pattern Detected',
@@ -75,6 +78,7 @@ const STEPS: DemoStep[] = [
     phase: 'CRITICAL',
     vitals: { hr: 138, rr: 30, sbp: 78, temp: 39.4, lactate: 4.1 },
     narrative: 'System flags high mortality risk — 6 hours before standard escalation would occur.',
+    voiceScript: 'Sepsis protocol has been activated. Risk score is now 9 out of 12. Heart rate 138. Systolic blood pressure 78. Lactate has risen to 4.1 millimoles per liter — indicating severe tissue hypoperfusion and multi-organ dysfunction risk. The system has identified this critical pattern 6 hours before standard clinical escalation would typically occur. Recommended actions include blood cultures, broad-spectrum antibiotics, lactate measurement, IV fluid resuscitation, and immediate ICU review.',
     panel: 'clinical',
     triggeredFactors: ['HR > 90 bpm', 'SBP < 90 mmHg', 'Lactate > 4 mmol/L', 'RR > 20/min', 'Temp > 39°C', 'Multi-organ dysfunction'],
     actions: ['Blood cultures ×2', 'Broad-spectrum antibiotics', 'Lactate measurement', 'IV fluid resuscitation', 'ICU review'],
@@ -91,6 +95,7 @@ const STEPS: DemoStep[] = [
     phase: 'DRUG_CHECK',
     vitals: { hr: 138, rr: 30, sbp: 78, temp: 39.4, lactate: 4.1 },
     narrative: 'Therapy safety validated in real time. Renal modifier applied — dose adjustment recommended.',
+    voiceScript: 'The clinical team has ordered Piperacillin-Tazobactam. The drug safety engine is now performing a real-time cross-reference against this patient\'s complete medication profile and clinical context. Alert detected: renal function is impaired, with creatinine clearance below 40 milliliters per minute. A standard dose would risk nephrotoxicity. The system recommends reducing to 2.25 grams every 8 hours, monitoring renal function every 12 hours, and avoiding concurrent nephrotoxins. Therapy validated and personalized — in real time.',
     panel: 'medication',
     triggeredFactors: ['Broad-spectrum ABx ordered', 'Renal function impaired', 'Drug interaction scan active'],
     drugWarning: 'Piperacillin-Tazobactam: Renal dose adjustment required (CrCl < 40)',
@@ -106,6 +111,7 @@ const STEPS: DemoStep[] = [
     phase: 'OPS_IMPACT',
     vitals: { hr: 138, rr: 30, sbp: 78, temp: 39.4, lactate: 4.1 },
     narrative: 'Hospital operations adapt automatically. Bed allocation optimized.',
+    voiceScript: 'ICU occupancy has reached 85 percent. The operations forecasting engine has detected that this patient\'s admission is creating a surge condition. Only 2 ICU beds remain. Rather than waiting for a capacity crisis, the system is already recommending to expedite discharge reviews, activate surge protocol, and notify the on-call administrator. Operational awareness — ahead of the event, not after it.',
     panel: 'operations',
     triggeredFactors: ['ICU occupancy > 85%', 'Surge threshold approaching', 'Step-down unit at capacity'],
     opsAlert: 'ICU SURGE WARNING — 2 beds remaining',
@@ -121,6 +127,7 @@ const STEPS: DemoStep[] = [
     phase: 'COMMAND',
     vitals: { hr: 138, rr: 30, sbp: 78, temp: 39.4, lactate: 4.1 },
     narrative: 'One platform. Total situational awareness. Clinical risk, medication safety, capacity forecast, and model health — unified.',
+    voiceScript: 'This is the MediRangeX Command Center — your unified clinical intelligence hub. In this single scenario, the platform detected sepsis 6 hours before a standard crash, prevented an adverse drug event, and optimized ICU capacity before a crisis developed. Clinical risk, medication safety, operational forecasting, and AI model health — all unified in one intelligence layer, operating in real time. Enter the Command Center to experience it live.',
     panel: 'command',
     triggeredFactors: ['Clinical: CRITICAL', 'Medication: ALERT ACTIVE', 'Operations: SURGE WARNING', 'ML: 94% confidence'],
     actions: ['Enter Command Center'],
@@ -242,39 +249,158 @@ function ImpactSummary({ onEnter }: { onEnter: () => void }) {
   );
 }
 
+function WaveformBars({ color }: { color: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+      {[0, 1, 2, 3, 4].map(i => (
+        <div
+          key={i}
+          style={{
+            width: '3px',
+            borderRadius: '2px',
+            background: color,
+            animation: `guide-wave 1.1s ease-in-out ${i * 0.12}s infinite`,
+            height: i % 2 === 0 ? '10px' : '16px',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SubtitleBar({ text, color, visible }: { text: string; color: string; visible: boolean }) {
+  if (!visible || !text) return null;
+  return (
+    <div style={{
+      position: 'relative',
+      padding: '0.75rem 1rem 0.75rem 1.25rem',
+      background: `${color}08`,
+      border: `1px solid ${color}20`,
+      borderRadius: '0.5rem',
+      animation: 'fade-up 0.2s ease forwards',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '3px',
+        height: '100%',
+        background: color,
+        opacity: 0.7,
+      }} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem' }}>
+        <WaveformBars color={color} />
+        <p style={{
+          margin: 0,
+          fontSize: '0.78rem',
+          color: '#c8d3e2',
+          lineHeight: 1.65,
+          fontStyle: 'italic',
+          flex: 1,
+        }}>
+          {text}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function ClinicalDemoSection() {
   const [currentStep, setCurrentStep] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [subtitleText, setSubtitleText] = useState('');
   const [showReasoning, setShowReasoning] = useState(false);
   const [showImpact, setShowImpact] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ttsSupported = isTTSSupported();
   const navigate = useNavigate();
+  const playingRef = useRef(false);
 
   const step = STEPS[currentStep];
 
-  const stopPlay = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+  const handleStepComplete = useCallback((completedIndex: number) => {
+    if (!playingRef.current) return;
+
+    const nextIndex = completedIndex + 1;
+
+    if (nextIndex >= STEPS.length) {
+      setPlaying(false);
+      setIsSpeaking(false);
+      setSubtitleText('');
+      playingRef.current = false;
+      setShowImpact(true);
+
+      if (voiceEnabled && ttsSupported) {
+        speak(
+          'Demo complete. MediRangeX detected the crisis, protected the patient, and coordinated the entire care pathway — automatically.',
+          {
+            profile: 'investor',
+            onEnd: () => { setIsSpeaking(false); setSubtitleText(''); },
+            onError: () => { setIsSpeaking(false); setSubtitleText(''); },
+          },
+        );
+        setIsSpeaking(true);
+        setSubtitleText('Demo complete. MediRangeX detected the crisis, protected the patient, and coordinated the entire care pathway — automatically.');
+      }
+      return;
     }
-    setPlaying(false);
-  }, []);
+
+    setCurrentStep(nextIndex);
+  }, [voiceEnabled, ttsSupported]);
+
+  const speakStep = useCallback((index: number) => {
+    if (!voiceEnabled || !ttsSupported) return;
+
+    const script = STEPS[index].voiceScript;
+    setSubtitleText(script);
+    setIsSpeaking(true);
+
+    speak(script, {
+      profile: 'investor',
+      onEnd: () => {
+        setIsSpeaking(false);
+        setSubtitleText('');
+        setTimeout(() => handleStepComplete(index), 300);
+      },
+      onError: () => {
+        setIsSpeaking(false);
+        setSubtitleText('');
+        setTimeout(() => handleStepComplete(index), 300);
+      },
+    });
+  }, [voiceEnabled, ttsSupported, handleStepComplete]);
 
   const startPlay = useCallback(() => {
     setPlaying(true);
     setShowImpact(false);
-    intervalRef.current = setInterval(() => {
-      setCurrentStep(s => {
-        if (s >= STEPS.length - 1) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-          setPlaying(false);
-          setShowImpact(true);
-          return s;
-        }
-        return s + 1;
-      });
-    }, 3000);
+    playingRef.current = true;
+
+    if (voiceEnabled && ttsSupported) {
+      speakStep(currentStep);
+    } else {
+      const interval = setInterval(() => {
+        setCurrentStep(s => {
+          if (s >= STEPS.length - 1) {
+            clearInterval(interval);
+            setPlaying(false);
+            playingRef.current = false;
+            setShowImpact(true);
+            return s;
+          }
+          return s + 1;
+        });
+      }, 3000);
+    }
+  }, [currentStep, voiceEnabled, ttsSupported, speakStep]);
+
+  const stopPlay = useCallback(() => {
+    stopSpeaking();
+    playingRef.current = false;
+    setPlaying(false);
+    setIsSpeaking(false);
+    setSubtitleText('');
   }, []);
 
   const reset = useCallback(() => {
@@ -290,9 +416,16 @@ export default function ClinicalDemoSection() {
     setShowImpact(false);
   }, [stopPlay]);
 
+  const handleManualStepSelect = useCallback((index: number) => {
+    stopPlay();
+    setCurrentStep(index);
+    setShowImpact(false);
+  }, [stopPlay]);
+
   useEffect(() => {
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      stopSpeaking();
+      playingRef.current = false;
     };
   }, []);
 
@@ -301,8 +434,7 @@ export default function ClinicalDemoSection() {
   const isRRAbnormal = v.rr > 20;
   const isSBPAbnormal = v.sbp < 90;
   const isTempAbnormal = v.temp > 38.0;
-
-  const progress = ((currentStep) / (STEPS.length - 1)) * 100;
+  const progress = (currentStep / (STEPS.length - 1)) * 100;
 
   return (
     <section id="clinical-demo" style={{ padding: '7rem 0', position: 'relative', overflow: 'hidden' }}>
@@ -431,7 +563,7 @@ export default function ClinicalDemoSection() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#475569', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace' " }}>
+                  <div style={{ fontSize: '0.65rem', color: '#475569', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>
                     {step.time} — {step.phase}
                   </div>
                   <div style={{ fontSize: '1rem', fontWeight: 700, color: '#f0f4ff', marginTop: '0.1rem' }}>
@@ -439,18 +571,59 @@ export default function ClinicalDemoSection() {
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#64748b' }}>{step.subtitle}</div>
                 </div>
-                <div style={{
-                  padding: '0.35rem 0.75rem',
-                  borderRadius: '0.375rem',
-                  background: `${step.riskColor}12`,
-                  border: `1px solid ${step.riskColor}30`,
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  color: step.riskColor,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                }}>
-                  {step.panel === 'clinical' ? 'Clinical Risk' : step.panel === 'medication' ? 'Drug Safety' : step.panel === 'operations' ? 'Operations' : 'Command Center'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {ttsSupported && (
+                    <button
+                      onClick={() => {
+                        if (playing) stopPlay();
+                        setVoiceEnabled(v => !v);
+                      }}
+                      title={voiceEnabled ? 'Mute narration' : 'Enable narration'}
+                      style={{
+                        padding: '0.3rem 0.6rem',
+                        background: voiceEnabled ? 'rgba(56,189,248,0.1)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${voiceEnabled ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.07)'}`,
+                        borderRadius: '0.375rem',
+                        color: voiceEnabled ? '#38bdf8' : '#475569',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.3rem',
+                        fontSize: '0.65rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        transition: 'all 0.15s ease',
+                        fontFamily: "'Inter', system-ui, sans-serif",
+                      }}
+                    >
+                      {voiceEnabled ? (
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        </svg>
+                      ) : (
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <line x1="23" x2="17" y1="9" y2="15" /><line x1="17" x2="23" y1="9" y2="15" />
+                        </svg>
+                      )}
+                      {voiceEnabled ? 'Voice On' : 'Voice Off'}
+                    </button>
+                  )}
+                  <div style={{
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '0.375rem',
+                    background: `${step.riskColor}12`,
+                    border: `1px solid ${step.riskColor}30`,
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    color: step.riskColor,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {step.panel === 'clinical' ? 'Clinical Risk' : step.panel === 'medication' ? 'Drug Safety' : step.panel === 'operations' ? 'Operations' : 'Command Center'}
+                  </div>
                 </div>
               </div>
 
@@ -470,13 +643,37 @@ export default function ClinicalDemoSection() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: subtitleText ? '0.75rem' : '0' }}>
                 <button
                   className={playing ? 'btn-ghost' : 'btn-primary'}
                   onClick={playing ? stopPlay : startPlay}
-                  style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    fontSize: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    position: 'relative',
+                  }}
                 >
-                  {playing ? <><span>⏸</span> Pause</> : <><span>▶</span> Play Demo</>}
+                  {playing ? (
+                    <>
+                      {isSpeaking && voiceEnabled ? <WaveformBars color="#94a3b8" /> : <span>⏸</span>}
+                      {isSpeaking && voiceEnabled ? 'Narrating...' : 'Pause'}
+                    </>
+                  ) : (
+                    <>
+                      {voiceEnabled && ttsSupported ? (
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        </svg>
+                      ) : (
+                        <span>▶</span>
+                      )}
+                      Play Demo
+                    </>
+                  )}
                 </button>
                 <button className="btn-ghost" onClick={reset} style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>
                   ⟲ Reset
@@ -492,13 +689,19 @@ export default function ClinicalDemoSection() {
                   AI Reasoning
                 </button>
               </div>
+
+              <SubtitleBar
+                text={subtitleText}
+                color={step.riskColor}
+                visible={isSpeaking && voiceEnabled}
+              />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
               {STEPS.map((s, i) => (
                 <button
                   key={i}
-                  onClick={() => { stopPlay(); setCurrentStep(i); setShowImpact(false); }}
+                  onClick={() => handleManualStepSelect(i)}
                   style={{
                     background: i === currentStep ? `${s.riskColor}20` : 'rgba(8,12,20,0.8)',
                     border: `1px solid ${i === currentStep ? s.riskColor + '50' : 'rgba(255,255,255,0.05)'}`,
