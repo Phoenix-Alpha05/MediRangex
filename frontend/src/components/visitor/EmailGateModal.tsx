@@ -169,7 +169,7 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
               }}>
-                Restricted Access — Live Demo
+                Welcome — Exclusive Live Preview
               </span>
             </div>
 
@@ -185,7 +185,7 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}>
-                You are entering a different<br />class of clinical intelligence.
+                A new standard of clinical<br />intelligence awaits you.
               </h2>
             </div>
 
@@ -201,9 +201,9 @@ export function EmailGateModal({ onEmailConfirmed }: Props) {
                 lineHeight: 1.75,
                 fontWeight: 400,
               }}>
-                MediRangeX synthesises real-time patient data, predictive AI,
-                and advanced clinical reasoning into a single command environment.
-                Used by forward-thinking healthcare leaders.
+                You are about to step into MediRangeX — where real-time patient intelligence,
+                predictive AI, and advanced clinical reasoning converge into one powerful command environment.
+                Trusted by the most forward-thinking leaders in modern healthcare.
               </p>
             </div>
 
