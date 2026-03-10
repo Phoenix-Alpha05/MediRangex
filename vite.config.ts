@@ -7,7 +7,7 @@ export default defineConfig({
   base: '/',
   envDir: '../',
   build: {
-    outDir: 'dist',
+    outDir: '../dist',
     emptyOutDir: true,
   },
   preview: {
