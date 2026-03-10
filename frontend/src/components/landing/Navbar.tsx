@@ -86,6 +86,18 @@ export default function Navbar({ onRequestAccess }: NavbarProps) {
               </button>
             ))}
             <button
+              onClick={() => navigate('/platform-spec')}
+              className="nav-link"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              Spec
+            </button>
+            <button
               onClick={() => navigate('/dashboard/command-center')}
               className="nav-link"
               style={{

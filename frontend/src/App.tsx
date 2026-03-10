@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import { CommandCenter } from './pages/CommandCenter';
 import AdminPage from './pages/AdminPage';
+import PlatformSpec from './pages/PlatformSpec';
 import { AIGuideWidget } from './ai-guide';
 import { EmailGateModal } from './components/visitor/EmailGateModal';
 import { FeedbackModal } from './components/visitor/FeedbackModal';
@@ -74,6 +75,7 @@ function AppInner() {
       {visitorEmail && (
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/platform-spec" element={<PlatformSpec />} />
           <Route path="/command-center" element={<CommandCenter />} />
           <Route path="/dashboard/command-center" element={<CommandCenter />} />
         </Routes>
