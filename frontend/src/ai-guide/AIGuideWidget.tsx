@@ -497,32 +497,52 @@ export function AIGuideWidget() {
           </div>
         )}
 
-        <button
-          onClick={guide.toggleOpen}
-          style={{
-            width: '52px',
-            height: '52px',
-            borderRadius: '50%',
-            background: guide.isOpen
-              ? `${accentColor}20`
-              : `linear-gradient(135deg, ${accentColor}25, ${accentColor}10)`,
-            border: `1.5px solid ${guide.isOpen ? accentColor : accentColor + '50'}`,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: guide.status === 'speaking'
-              ? `0 0 0 0 ${accentColor}40, 0 8px 32px rgba(0,0,0,0.4)`
-              : `0 8px 32px rgba(0,0,0,0.4)`,
-            animation: guide.status === 'speaking'
-              ? 'guide-orb-ring 1.8s ease-out infinite'
-              : 'none',
-            transition: 'all 0.2s ease',
-          }}
-          title={guide.isOpen ? 'Close ARIA' : 'Open ARIA'}
-        >
-          <OrbIcon status={guide.status} color={accentColor} />
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+          <button
+            onClick={guide.toggleOpen}
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              background: guide.isOpen
+                ? `${accentColor}20`
+                : 'linear-gradient(135deg, #F59E0B44, #D97706aa)',
+              border: guide.isOpen
+                ? `1.5px solid ${accentColor}`
+                : '1.5px solid #F59E0B',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: guide.isOpen
+                ? `0 8px 32px rgba(0,0,0,0.4)`
+                : guide.status === 'speaking'
+                  ? `0 0 0 0 #F59E0B40, 0 8px 32px rgba(245,158,11,0.35)`
+                  : `0 0 18px rgba(245,158,11,0.3), 0 8px 32px rgba(0,0,0,0.4)`,
+              animation: guide.status === 'speaking'
+                ? 'guide-orb-ring 1.8s ease-out infinite'
+                : 'none',
+              transition: 'all 0.2s ease',
+            }}
+            title={guide.isOpen ? 'Close ARIA' : 'ARIA - Your Guide'}
+          >
+            <OrbIcon status={guide.status} color={guide.isOpen ? accentColor : '#F59E0B'} />
+          </button>
+          {!guide.isOpen && (
+            <span style={{
+              fontSize: '8px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#F59E0B',
+              fontFamily: "'Inter', system-ui, sans-serif",
+              textShadow: '0 1px 6px rgba(245,158,11,0.4)',
+              whiteSpace: 'nowrap',
+            }}>
+              ARIA - Your Guide
+            </span>
+          )}
+        </div>
       </div>
     </>
   );
