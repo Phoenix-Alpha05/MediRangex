@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import { CommandCenter } from './pages/CommandCenter';
+import AdminPage from './pages/AdminPage';
 import { AIGuideWidget } from './ai-guide';
 import { EmailGateModal } from './components/visitor/EmailGateModal';
 import { FeedbackModal } from './components/visitor/FeedbackModal';
@@ -12,6 +13,8 @@ const FEEDBACK_TRIGGER_DELAY_MS = 45_000;
 
 function AppInner() {
   const location = useLocation();
+  const isAdminRoute = location.pathname === '/admin';
+
   const [visitorEmail, setVisitorEmail] = useState<string | null>(
     () => localStorage.getItem(STORAGE_EMAIL_KEY)
   );
@@ -29,6 +32,8 @@ function AppInner() {
   };
 
   useEffect(() => {
+    if (isAdminRoute) return;
+
     const isOnDashboard =
       location.pathname === '/command-center' ||
       location.pathname === '/dashboard/command-center';
@@ -52,7 +57,15 @@ function AppInner() {
         feedbackTimerRef.current = null;
       }
     };
-  }, [location.pathname, visitorEmail]);
+  }, [location.pathname, visitorEmail, isAdminRoute]);
+
+  if (isAdminRoute) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    );
+  }
 
   return (
     <>
