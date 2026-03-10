@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build",
+    "build": "vite build",
     "preview": "npx serve frontend/dist -s -l 4173"
   },
   "devDependencies": {
