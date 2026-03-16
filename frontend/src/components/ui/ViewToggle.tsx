@@ -28,7 +28,7 @@ export function ViewToggle() {
       className="view-toggle-widget"
       style={{
         position: 'fixed',
-        top: '1rem',
+        top: '72px',
         right: '1rem',
         zIndex: 10000,
         display: 'flex',
