@@ -25,7 +25,25 @@ interface WindowWithSR {
 }
 
 let recognition: SpeechRecognitionLike | null = null;
-let isCancelled = false;
+let activeSessionId = 0;
+let keepAliveTimer: ReturnType<typeof setInterval> | null = null;
+
+function startKeepAlive(): void {
+  stopKeepAlive();
+  keepAliveTimer = setInterval(() => {
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    }
+  }, 10000);
+}
+
+function stopKeepAlive(): void {
+  if (keepAliveTimer !== null) {
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = null;
+  }
+}
 
 function preprocessForSpeech(text: string): string {
   return text.replace(/(\d+)\.(\d+)/g, (_, whole, frac) => `${whole} point ${frac}`);
@@ -69,9 +87,12 @@ function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
   return en[0] ?? voices[0] ?? null;
 }
 
-function speakChunks(chunks: string[], index: number, options: SpeakOptions): void {
-  if (isCancelled || index >= chunks.length) {
-    if (!isCancelled) options.onEnd?.();
+function speakChunks(chunks: string[], index: number, sessionId: number, options: SpeakOptions): void {
+  if (sessionId !== activeSessionId || index >= chunks.length) {
+    if (sessionId === activeSessionId) {
+      stopKeepAlive();
+      options.onEnd?.();
+    }
     return;
   }
 
@@ -93,14 +114,15 @@ function speakChunks(chunks: string[], index: number, options: SpeakOptions): vo
   };
 
   utt.onend = () => {
-    if (isCancelled) return;
-    setTimeout(() => speakChunks(chunks, index + 1, options), 80);
+    if (sessionId !== activeSessionId) return;
+    setTimeout(() => speakChunks(chunks, index + 1, sessionId, options), 80);
   };
 
   utt.onerror = (e) => {
-    if ((e as SpeechSynthesisErrorEvent).error === 'interrupted' || (e as SpeechSynthesisErrorEvent).error === 'canceled') {
-      return;
-    }
+    if (sessionId !== activeSessionId) return;
+    const err = (e as SpeechSynthesisErrorEvent).error;
+    if (err === 'interrupted' || err === 'canceled') return;
+    stopKeepAlive();
     options.onError?.();
   };
 
@@ -110,13 +132,17 @@ function speakChunks(chunks: string[], index: number, options: SpeakOptions): vo
 export function speak(text: string, options: SpeakOptions): void {
   if (!('speechSynthesis' in window)) return;
 
-  stopSpeaking();
-  isCancelled = false;
+  activeSessionId += 1;
+  const sessionId = activeSessionId;
+
+  window.speechSynthesis.cancel();
 
   const chunks = splitIntoChunks(text);
 
   const startSpeaking = () => {
-    speakChunks(chunks, 0, options);
+    if (sessionId !== activeSessionId) return;
+    startKeepAlive();
+    speakChunks(chunks, 0, sessionId, options);
   };
 
   const voices = window.speechSynthesis.getVoices();
@@ -131,7 +157,8 @@ export function speak(text: string, options: SpeakOptions): void {
 }
 
 export function stopSpeaking(): void {
-  isCancelled = true;
+  activeSessionId += 1;
+  stopKeepAlive();
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }

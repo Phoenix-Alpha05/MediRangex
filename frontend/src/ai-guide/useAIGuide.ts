@@ -25,6 +25,7 @@ export function useAIGuide() {
   const isTourActiveRef = useRef(false);
   const isPausedRef = useRef(false);
   const isCancelledRef = useRef(false);
+  const runTourFromStepRef = useRef<(stepIndex: number, stepsArr: typeof clinicalSteps, currentMode: GuideMode) => void>(() => {});
 
   const ttsSupported = isTTSSupported();
   const sttSupported = isSTTSupported();
@@ -70,7 +71,7 @@ export function useAIGuide() {
     });
   }, [ttsSupported, clearHighlight]);
 
-  const runTourFromStep = useCallback((stepIndex: number, stepsArr: typeof clinicalSteps, currentMode: GuideMode) => {
+  runTourFromStepRef.current = (stepIndex: number, stepsArr: typeof clinicalSteps, currentMode: GuideMode) => {
     if (isCancelledRef.current) return;
 
     if (stepIndex >= stepsArr.length) {
@@ -94,9 +95,15 @@ export function useAIGuide() {
 
     speakStep(step.script, () => {
       if (isCancelledRef.current || isPausedRef.current) return;
-      runTourFromStep(stepIndex + 1, stepsArr, currentMode);
+      runTourFromStepRef.current(stepIndex + 1, stepsArr, currentMode);
     });
-  }, [speakStep]);
+  };
+
+  const runTourFromStep = useCallback(
+    (stepIndex: number, stepsArr: typeof clinicalSteps, currentMode: GuideMode) =>
+      runTourFromStepRef.current(stepIndex, stepsArr, currentMode),
+    [],
+  );
 
   const showIdlePrompt = useCallback(() => {
     if (isTourActiveRef.current) return;
