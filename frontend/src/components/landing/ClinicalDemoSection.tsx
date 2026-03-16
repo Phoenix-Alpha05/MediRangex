@@ -280,6 +280,27 @@ function ImpactSummary({ onEnter }: { onEnter: () => void }) {
           </div>
         ))}
       </div>
+      <div style={{
+        background: 'rgba(15,23,42,0.8)',
+        border: '1px solid rgba(148,163,184,0.12)',
+        borderRadius: '0.625rem',
+        padding: '0.875rem 1rem',
+        marginBottom: '1rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '0.1rem' }}>
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <div>
+            <div style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+              Important Disclosure
+            </div>
+            <p style={{ margin: 0, fontSize: '0.68rem', color: '#475569', lineHeight: 1.65 }}>
+              This scenario presents a status report derived from patient conditions, guided by standard and established national and international clinical guidelines. <strong style={{ color: '#64748b', fontWeight: 600 }}>MediRangeX does not provide medical advice.</strong> All outputs are decision-support recommendations only. The ultimate clinical decision authority rests exclusively with the treating physician and care team.
+            </p>
+          </div>
+        </div>
+      </div>
       <button
         className="btn-primary"
         onClick={onEnter}
@@ -354,7 +375,7 @@ export default function ClinicalDemoSection() {
     setShowImpact(true);
 
     if (ttsSupported) {
-      const outro = 'Patient stabilized. What you have just witnessed is the standard of care that MediRangeX makes possible — earlier detection, safer therapy, and coordinated operations, all in one platform.';
+      const outro = 'Patient stabilized. What you have just witnessed is the standard of care that MediRangeX makes possible — earlier detection, safer therapy, and coordinated operations, all in one platform. Important disclosure: all outputs shown represent status reports guided by standard and established national and international clinical guidelines. MediRangeX does not provide medical advice. Every recommendation is a decision-support signal only. The ultimate clinical authority rests entirely with the treating physician and care team.';
       setIsSpeaking(true);
       setSubtitleText(outro);
       speak(outro, {

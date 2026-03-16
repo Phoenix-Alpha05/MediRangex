@@ -26,6 +26,7 @@ interface WindowWithSR {
 
 let recognition: SpeechRecognitionLike | null = null;
 let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
+let isCancelled = false;
 
 function startKeepAlive(): void {
   stopKeepAlive();
@@ -42,6 +43,11 @@ function stopKeepAlive(): void {
     clearInterval(keepAliveInterval);
     keepAliveInterval = null;
   }
+}
+
+function splitIntoChunks(text: string): string[] {
+  const raw = text.match(/[^.!?]+(?:[.!?]+(?:\s|$))?/g) ?? [text];
+  return raw.map(s => s.trim()).filter(s => s.length > 0);
 }
 
 function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
@@ -76,54 +82,75 @@ function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
   return en[0] ?? voices[0] ?? null;
 }
 
-export function speak(text: string, options: SpeakOptions): void {
-  if (!('speechSynthesis' in window)) return;
+function speakChunks(chunks: string[], index: number, options: SpeakOptions): void {
+  if (isCancelled || index >= chunks.length) {
+    stopKeepAlive();
+    if (!isCancelled) options.onEnd?.();
+    return;
+  }
 
-  stopSpeaking();
-
-  const utt = new SpeechSynthesisUtterance(text);
+  const chunk = chunks[index];
+  const utt = new SpeechSynthesisUtterance(chunk);
   utt.lang = 'en-GB';
   utt.rate = options.profile === 'clinical' ? 0.9 : 0.95;
   utt.pitch = 1.1;
   utt.volume = 1;
 
-  const setVoiceAndSpeak = () => {
-    const voice = pickVoice(options.profile);
-    if (voice) utt.voice = voice;
+  const voice = pickVoice(options.profile);
+  if (voice) utt.voice = voice;
 
-    utt.onboundary = (e) => {
-      if (e.name === 'word' && options.onWord) {
-        const word = text.slice(e.charIndex, e.charIndex + e.charLength);
-        options.onWord(word, e.charIndex);
-      }
-    };
+  utt.onboundary = (e) => {
+    if (e.name === 'word' && options.onWord) {
+      const word = chunk.slice(e.charIndex, e.charIndex + e.charLength);
+      options.onWord(word, e.charIndex);
+    }
+  };
 
-    utt.onend = () => {
+  utt.onend = () => {
+    if (isCancelled) {
       stopKeepAlive();
-      options.onEnd?.();
-    };
+      return;
+    }
+    setTimeout(() => speakChunks(chunks, index + 1, options), 80);
+  };
 
-    utt.onerror = () => {
-      stopKeepAlive();
-      options.onError?.();
-    };
+  utt.onerror = (e) => {
+    if ((e as SpeechSynthesisErrorEvent).error === 'interrupted' || (e as SpeechSynthesisErrorEvent).error === 'canceled') {
+      return;
+    }
+    stopKeepAlive();
+    options.onError?.();
+  };
 
-    window.speechSynthesis.speak(utt);
+  window.speechSynthesis.speak(utt);
+}
+
+export function speak(text: string, options: SpeakOptions): void {
+  if (!('speechSynthesis' in window)) return;
+
+  stopSpeaking();
+  isCancelled = false;
+
+  const chunks = splitIntoChunks(text);
+
+  const startSpeaking = () => {
     startKeepAlive();
+    speakChunks(chunks, 0, options);
   };
 
   const voices = window.speechSynthesis.getVoices();
   if (voices.length > 0) {
-    setVoiceAndSpeak();
+    startSpeaking();
   } else {
     window.speechSynthesis.onvoiceschanged = () => {
       window.speechSynthesis.onvoiceschanged = null;
-      setVoiceAndSpeak();
+      startSpeaking();
     };
   }
 }
 
 export function stopSpeaking(): void {
+  isCancelled = true;
   stopKeepAlive();
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
