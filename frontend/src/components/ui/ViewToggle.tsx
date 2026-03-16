@@ -29,7 +29,7 @@ export function ViewToggle() {
       style={{
         position: 'fixed',
         top: '72px',
-        right: '4rem',
+        right: '8rem',
         zIndex: 10000,
         display: 'flex',
         alignItems: 'center',
