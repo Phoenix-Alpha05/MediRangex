@@ -484,8 +484,31 @@ body {
   .show-mobile { display: none !important; }
 }
 
-/* Prevent horizontal overflow globally on mobile */
+/* ─── View Toggle: hide on actual small screens ─────────────── */
+@media (max-width: 768px) {
+  .view-toggle-widget { display: none !important; }
+}
+
+/* ─── Global mobile fixes ────────────────────────────────────── */
 @media (max-width: 768px) {
   html, body { overflow-x: hidden; }
+
   .section-padded { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+  /* Tighten all btn styles on narrow screens */
+  .btn-primary,
+  .btn-ghost,
+  .btn-demo {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.82rem;
+  }
+
+  /* Prevent wide tables/grids from forcing horizontal scroll */
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
+
+/* ─── Phone Frame Simulation (desktop mobile preview) ─────────── */
+.phone-frame-active body {
+  overflow: hidden;
+}
+

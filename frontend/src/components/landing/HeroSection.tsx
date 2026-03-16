@@ -179,9 +179,9 @@ function AboutPanel() {
         </div>
 
         <h2 style={{
-          fontSize: 'clamp(1.8rem, 3vw, 2.75rem)',
+          fontSize: isMobile ? '1.5rem' : 'clamp(1.8rem, 3vw, 2.75rem)',
           fontWeight: 900,
-          lineHeight: 1.1,
+          lineHeight: 1.15,
           letterSpacing: '-0.03em',
           margin: '0 0 1.25rem',
           color: '#f0f4ff',
@@ -419,11 +419,11 @@ export default function HeroSection() {
               </div>
 
               <h1 style={{
-                fontSize: 'clamp(2.5rem, 4vw, 3.75rem)',
+                fontSize: isMobile ? '1.75rem' : 'clamp(2.5rem, 4vw, 3.75rem)',
                 fontWeight: 900,
-                lineHeight: 1.1,
+                lineHeight: 1.15,
                 letterSpacing: '-0.03em',
-                margin: '0 0 1.5rem',
+                margin: isMobile ? '0 0 0.9rem' : '0 0 1.5rem',
                 animation: 'fade-up 0.6s ease 0.1s both',
               }}>
                 <span style={{ color: '#f0f4ff' }}>Hospital Intelligence</span>
@@ -432,11 +432,11 @@ export default function HeroSection() {
               </h1>
 
               <p style={{
-                fontSize: '1.05rem',
-                lineHeight: 1.7,
+                fontSize: isMobile ? '0.875rem' : '1.05rem',
+                lineHeight: 1.65,
                 color: '#94a3b8',
                 maxWidth: 520,
-                margin: '0 0 1.5rem',
+                margin: isMobile ? '0 0 1rem' : '0 0 1.5rem',
                 animation: 'fade-up 0.6s ease 0.2s both',
               }}>
                 MediRangeX integrates real-time sepsis prediction, drug safety intelligence,
@@ -450,8 +450,8 @@ export default function HeroSection() {
 
               <div style={{
                 display: 'flex',
-                gap: '0.75rem',
-                marginBottom: '3rem',
+                gap: '0.6rem',
+                marginBottom: isMobile ? '1.5rem' : '3rem',
                 flexWrap: 'wrap',
                 animation: 'fade-up 0.6s ease 0.3s both',
               }}>
@@ -483,7 +483,7 @@ export default function HeroSection() {
                     transition: 'all 0.3s ease',
                   }}>
                     <div style={{
-                      fontSize: '1.6rem',
+                      fontSize: isMobile ? '1.25rem' : '1.6rem',
                       fontWeight: 700,
                       fontFamily: "'JetBrains Mono', monospace",
                       color: stat.color,
@@ -548,10 +548,11 @@ export default function HeroSection() {
                 </div>
 
                 <div style={{
-                  padding: '0.75rem 1.25rem',
+                  padding: '0.6rem 1rem',
                   borderTop: '1px solid rgba(56,189,248,0.08)',
                   display: 'flex',
-                  gap: '1.5rem',
+                  flexWrap: 'wrap',
+                  gap: isMobile ? '0.5rem 1rem' : '1.5rem',
                   alignItems: 'center',
                 }}>
                   {[
