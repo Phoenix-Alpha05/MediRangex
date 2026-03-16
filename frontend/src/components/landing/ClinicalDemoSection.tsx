@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { speak, stopSpeaking, isTTSSupported } from '../../ai-guide/voiceEngine';
 
 interface DemoStep {
@@ -259,7 +260,7 @@ function ImpactSummary({ onEnter }: { onEnter: () => void }) {
           Outcome Summary
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
         {[
           { metric: '6 hrs', label: 'Earlier detection vs standard care', color: '#10b981' },
           { metric: '1 ADR', label: 'Adverse drug event prevented', color: '#f59e0b' },
@@ -365,6 +366,7 @@ export default function ClinicalDemoSection() {
   const [showImpact, setShowImpact] = useState(false);
   const ttsSupported = isTTSSupported();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const playingRef = useRef(false);
   const isCancelledRef = useRef(false);
   const runDemoStepRef = useRef<(index: number) => void>(() => {});
@@ -489,7 +491,7 @@ export default function ClinicalDemoSection() {
   const progress = (currentStep / (STEPS.length - 1)) * 100;
 
   return (
-    <section id="clinical-demo" style={{ padding: '7rem 0', position: 'relative', overflow: 'hidden' }}>
+    <section id="clinical-demo" style={{ padding: isMobile ? '4rem 0' : '7rem 0', position: 'relative', overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', top: '30%', left: '50%',
         transform: 'translate(-50%, -50%)', width: '70%', height: 400,
@@ -497,7 +499,7 @@ export default function ClinicalDemoSection() {
         pointerEvents: 'none',
       }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <span className="tag tag-cyan" style={{ marginBottom: '1rem', display: 'inline-flex' }}>
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#38bdf8', animation: 'pulse-dot 1.5s ease-in-out infinite', display: 'inline-block', marginRight: '0.3rem' }} />
@@ -511,7 +513,7 @@ export default function ClinicalDemoSection() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '1.5rem', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '320px 1fr', gap: '1.25rem', alignItems: 'start' }}>
           {/* Left column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div style={{

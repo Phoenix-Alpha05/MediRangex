@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import type { SystemStatusBlock } from '../../types/dashboard';
 import { Tooltip } from '../ui/Tooltip';
 import { getStatusTheme, kpiColor, resolveDisplayStatus } from '../../utils/statusColors';
@@ -120,6 +121,7 @@ function Kpi({ label, value, tip, color = '#e2e8f0', numericValue, previousValue
 
 export function SystemStatusBar({ data, loading, onRefresh }: Props) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const displayStatus = resolveDisplayStatus(data.system_status);
   const theme = getStatusTheme(displayStatus);
@@ -142,10 +144,12 @@ export function SystemStatusBar({ data, loading, onRefresh }: Props) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: '44px',
+        height: isMobile ? 'auto' : '44px',
+        minHeight: isMobile ? '40px' : undefined,
+        flexWrap: isMobile ? 'wrap' : undefined,
         background: '#0d1219',
         borderBottom: `1px solid ${theme.border}`,
-        padding: '0 16px',
+        padding: isMobile ? '6px 10px' : '0 16px',
         flexShrink: 0,
         gap: '8px',
       }}
@@ -183,7 +187,7 @@ export function SystemStatusBar({ data, loading, onRefresh }: Props) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             <span style={{ fontSize: '11px', fontWeight: 800, color: '#e8ecf4', letterSpacing: '0.04em', lineHeight: 1 }}>MediRangeX</span>
-            <span style={{ fontSize: '8px', color: '#4e5f74', letterSpacing: '0.08em', lineHeight: 1.2 }}>HOSPITAL INTELLIGENCE COMMAND CENTER</span>
+            {!isMobile && <span style={{ fontSize: '8px', color: '#4e5f74', letterSpacing: '0.08em', lineHeight: 1.2 }}>HOSPITAL INTELLIGENCE COMMAND CENTER</span>}
           </div>
         </div>
 

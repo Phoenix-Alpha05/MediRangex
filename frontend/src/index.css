@@ -474,3 +474,18 @@ body {
   from { opacity: 0; transform: scale(0.95) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* ─── Responsive Utilities ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .hidden-mobile { display: none !important; }
+  .show-mobile { display: flex !important; }
+}
+@media (min-width: 769px) {
+  .show-mobile { display: none !important; }
+}
+
+/* Prevent horizontal overflow globally on mobile */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; }
+  .section-padded { padding-left: 1rem !important; padding-right: 1rem !important; }
+}

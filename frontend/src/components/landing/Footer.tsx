@@ -1,11 +1,14 @@
+import { useIsMobile } from '../../hooks/useIsMobile';
+
 export default function Footer() {
+  const isMobile = useIsMobile();
   return (
     <footer style={{
       padding: '3rem 0 2rem',
       borderTop: '1px solid rgba(56,189,248,0.06)',
     }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '3rem', marginBottom: '3rem' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr', gap: isMobile ? '2rem' : '3rem', marginBottom: '2rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <div style={{
@@ -95,8 +98,10 @@ export default function Footer() {
 
         <div style={{
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'flex-start' : 'center',
           justifyContent: 'space-between',
+          gap: isMobile ? '0.875rem' : 0,
           paddingTop: '1.5rem',
           borderTop: '1px solid rgba(255,255,255,0.04)',
         }}>

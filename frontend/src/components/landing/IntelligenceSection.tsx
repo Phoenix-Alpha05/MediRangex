@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const MOCK_VITALS = {
   hr: [88, 92, 95, 101, 108, 115, 124, 132, 128, 135],
@@ -58,6 +59,7 @@ export default function IntelligenceSection() {
   const [step, setStep] = useState(0);
   const [running, setRunning] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (running) {
@@ -80,9 +82,9 @@ export default function IntelligenceSection() {
   };
 
   return (
-    <section id="sepsis-demo" style={{ padding: '7rem 0', position: 'relative' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
+    <section id="sepsis-demo" style={{ padding: isMobile ? '4rem 0' : '7rem 0', position: 'relative' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '2rem' : '4rem', alignItems: 'center' }}>
           <div>
             <span className="tag tag-emerald" style={{ marginBottom: '1rem', display: 'inline-flex' }}>
               Live Intelligence Demo

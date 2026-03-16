@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../hooks/useIsMobile';
 import SpecSidebar from '../components/spec/SpecSidebar';
 import SpecSectionBlock from '../components/spec/SpecSectionBlock';
 import { SPEC_SECTIONS, TOC_SECTIONS } from '../components/spec/specData';
 
 export default function PlatformSpec() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('section-1');
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -87,7 +89,7 @@ export default function PlatformSpec() {
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{
+            {!isMobile && <span style={{
               padding: '0.3rem 0.7rem',
               background: 'rgba(56,189,248,0.08)',
               border: '1px solid rgba(56,189,248,0.15)',
@@ -100,11 +102,11 @@ export default function PlatformSpec() {
               fontFamily: 'JetBrains Mono, monospace',
             }}>
               v2.4.1 — Enterprise
-            </span>
+            </span>}
             <button
               onClick={() => navigate('/command-center')}
               style={{
-                padding: '0.4rem 1rem',
+                padding: '0.4rem 0.875rem',
                 background: 'linear-gradient(135deg, #0ea5e9, #3b82f6)',
                 border: 'none',
                 borderRadius: 6,
@@ -113,9 +115,10 @@ export default function PlatformSpec() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 fontFamily: 'Inter, sans-serif',
+                whiteSpace: 'nowrap',
               }}
             >
-              Open Dashboard
+              Dashboard
             </button>
           </div>
         </div>
@@ -125,14 +128,14 @@ export default function PlatformSpec() {
         <div style={{
           maxWidth: 1400,
           margin: '0 auto',
-          padding: '0 1.5rem',
+          padding: isMobile ? '0 1rem' : '0 1.5rem',
           display: 'flex',
           gap: '3rem',
-          paddingTop: '2.5rem',
+          paddingTop: '2rem',
           paddingBottom: '4rem',
           alignItems: 'flex-start',
         }}>
-          <SpecSidebar activeSection={activeSection} onNavigate={handleNavigate} />
+          {!isMobile && <SpecSidebar activeSection={activeSection} onNavigate={handleNavigate} />}
 
           <main style={{ flex: 1, minWidth: 0 }}>
             <div style={{ marginBottom: '3rem' }}>

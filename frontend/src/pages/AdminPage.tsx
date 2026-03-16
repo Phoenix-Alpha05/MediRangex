@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -91,6 +92,7 @@ export default function AdminPage() {
   const avgRating = data?.feedback.length
     ? (data.feedback.reduce((sum, f) => sum + f.rating, 0) / data.feedback.length).toFixed(1)
     : null;
+  const isMobile = useIsMobile();
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -271,8 +273,8 @@ export default function AdminPage() {
         </button>
       </div>
 
-      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ padding: isMobile ? '1rem' : '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '0.875rem', marginBottom: '1.5rem' }}>
           {[
             {
               label: 'Total Visitors',
@@ -365,7 +367,8 @@ export default function AdminPage() {
             background: '#0d1219', border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: '10px', overflow: 'hidden',
           }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+            <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', minWidth: isMobile ? '520px' : undefined, borderCollapse: 'collapse', fontSize: '0.82rem' }}>
               <thead>
                 <tr style={{ background: '#0a0e17', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   {['Email', 'Access Count', 'First Visit', 'Last Visit'].map(h => (
@@ -417,6 +420,7 @@ export default function AdminPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
@@ -425,7 +429,8 @@ export default function AdminPage() {
             background: '#0d1219', border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: '10px', overflow: 'hidden',
           }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+            <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', minWidth: isMobile ? '540px' : undefined, borderCollapse: 'collapse', fontSize: '0.82rem' }}>
               <thead>
                 <tr style={{ background: '#0a0e17', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   {['Email', 'Rating', 'Comment', 'Submitted'].map(h => (
@@ -468,6 +473,7 @@ export default function AdminPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </div>

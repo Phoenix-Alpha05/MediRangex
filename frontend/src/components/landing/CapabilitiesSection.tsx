@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const CAPABILITIES = [
   {
@@ -167,11 +168,12 @@ const CAPABILITIES = [
 export default function CapabilitiesSection() {
   const [activeId, setActiveId] = useState('sepsis');
   const active = CAPABILITIES.find(c => c.id === activeId) ?? CAPABILITIES[0];
+  const isMobile = useIsMobile();
 
   return (
-    <section id="capabilities" style={{ padding: '7rem 0', position: 'relative' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+    <section id="capabilities" style={{ padding: isMobile ? '4rem 0' : '7rem 0', position: 'relative' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span className="tag tag-cyan" style={{ marginBottom: '1rem', display: 'inline-flex' }}>
             Capabilities
           </span>
@@ -190,8 +192,8 @@ export default function CapabilitiesSection() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '1.5rem', alignItems: 'start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '300px 1fr', gap: '1.25rem', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', flexWrap: isMobile ? 'wrap' : undefined, gap: '0.5rem' }}>
             {CAPABILITIES.map((cap) => (
               <button
                 key={cap.id}
@@ -199,15 +201,16 @@ export default function CapabilitiesSection() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '1rem',
-                  padding: '0.875rem 1rem',
+                  gap: isMobile ? '0.5rem' : '1rem',
+                  padding: isMobile ? '0.5rem 0.75rem' : '0.875rem 1rem',
                   borderRadius: '0.625rem',
                   border: `1px solid ${activeId === cap.id ? cap.color + '33' : 'rgba(255,255,255,0.05)'}`,
                   background: activeId === cap.id ? cap.dimColor : 'rgba(8,12,20,0.5)',
                   cursor: 'pointer',
                   transition: 'all 0.25s ease',
                   textAlign: 'left',
-                  width: '100%',
+                  width: isMobile ? 'auto' : '100%',
+                  flexShrink: 0,
                 }}
                 onMouseEnter={e => {
                   if (activeId !== cap.id) {
@@ -239,17 +242,20 @@ export default function CapabilitiesSection() {
                 </div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{
-                    fontSize: '0.85rem',
+                    fontSize: isMobile ? '0.75rem' : '0.85rem',
                     fontWeight: 600,
                     color: activeId === cap.id ? '#f0f4ff' : '#94a3b8',
                     transition: 'color 0.2s ease',
-                    marginBottom: '0.15rem',
+                    marginBottom: isMobile ? 0 : '0.15rem',
+                    whiteSpace: isMobile ? 'nowrap' : undefined,
                   }}>
                     {cap.title}
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: '#475569' }}>
-                    {cap.subtitle}
-                  </div>
+                  {!isMobile && (
+                    <div style={{ fontSize: '0.7rem', color: '#475569' }}>
+                      {cap.subtitle}
+                    </div>
+                  )}
                 </div>
                 {activeId === cap.id && (
                   <div style={{ marginLeft: 'auto', color: cap.color, flexShrink: 0 }}>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const STACK_LAYERS = [
   {
@@ -68,6 +69,7 @@ const API_ENDPOINTS = [
 
 export default function ArchitectureSection() {
   const [copiedPath, setCopiedPath] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const handleCopy = async (curl: string, path: string) => {
     try {
@@ -80,9 +82,9 @@ export default function ArchitectureSection() {
   };
 
   return (
-    <section id="architecture" style={{ padding: '7rem 0', position: 'relative' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+    <section id="architecture" style={{ padding: isMobile ? '4rem 0' : '7rem 0', position: 'relative' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span className="tag tag-cyan" style={{ marginBottom: '1rem', display: 'inline-flex' }}>
             Architecture
           </span>
@@ -101,7 +103,7 @@ export default function ArchitectureSection() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '2rem' : '3rem', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {STACK_LAYERS.map((layer, i) => (
               <div key={layer.label} style={{

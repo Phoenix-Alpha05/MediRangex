@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const CORRECT_PASSWORD = '1255657';
 
@@ -217,6 +218,7 @@ export default function ResourcesSection() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -258,7 +260,7 @@ export default function ResourcesSection() {
   ];
 
   return (
-    <section id="resources" style={{ padding: '7rem 0', position: 'relative' }}>
+    <section id="resources" style={{ padding: isMobile ? '4rem 0' : '7rem 0', position: 'relative' }}>
       <div style={{
         position: 'absolute',
         top: 0,
@@ -269,7 +271,7 @@ export default function ResourcesSection() {
         background: 'linear-gradient(90deg, transparent, rgba(56,189,248,0.15), transparent)',
       }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
         <div style={{ marginBottom: '3.5rem' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <span style={{
@@ -309,8 +311,9 @@ export default function ResourcesSection() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '1.5rem',
-                padding: '1.5rem 2rem',
+                flexWrap: isMobile ? 'wrap' : undefined,
+                gap: isMobile ? '0.875rem' : '1.5rem',
+                padding: isMobile ? '1rem 1.25rem' : '1.5rem 2rem',
                 background: hoveredId === resource.id
                   ? 'rgba(12,17,32,0.9)'
                   : 'rgba(8,12,20,0.6)',

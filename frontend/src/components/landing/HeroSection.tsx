@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SPEC_SECTIONS } from '../spec/specData';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const TERMINAL_LINES = [
   { text: '> Initializing MediRangeX Clinical Intelligence...', color: '#94a3b8', delay: 0 },
@@ -155,6 +156,7 @@ function RuntimeBanner() {
 }
 
 function AboutPanel() {
+  const isMobile = useIsMobile();
   const mission = OVERVIEW.subsections.find(s => s.title === 'Mission');
   const vision = OVERVIEW.subsections.find(s => s.title === 'Vision');
   const problem = OVERVIEW.subsections.find(s => s.title === 'Core Problem Statement');
@@ -163,8 +165,8 @@ function AboutPanel() {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '4rem',
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+      gap: isMobile ? '2rem' : '4rem',
       alignItems: 'start',
       animation: 'fade-up 0.4s ease forwards',
     }}>
@@ -304,6 +306,7 @@ export default function HeroSection() {
   const [lastLine, setLastLine] = useState(false);
   const [activeTab, setActiveTab] = useState<'platform' | 'about'>('platform');
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const scrollTo = useCallback((id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -364,7 +367,7 @@ export default function HeroSection() {
         pointerEvents: 'none',
       }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', width: '100%' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', width: '100%' }}>
         <div style={{
           display: 'flex',
           gap: '0.25rem',
@@ -403,8 +406,8 @@ export default function HeroSection() {
         {activeTab === 'platform' ? (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '4rem',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: isMobile ? '2.5rem' : '4rem',
             alignItems: 'center',
           }}>
             <div>
@@ -468,7 +471,7 @@ export default function HeroSection() {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '1rem',
+                gap: '0.75rem',
                 animation: 'fade-up 0.6s ease 0.4s both',
               }}>
                 {LIVE_STATS.map((stat) => (
@@ -576,7 +579,7 @@ export default function HeroSection() {
 
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
+                gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '0.75rem',
                 marginTop: '0.75rem',
               }}>

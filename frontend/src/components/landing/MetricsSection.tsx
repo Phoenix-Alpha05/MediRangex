@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 function useInView(ref: React.RefObject<HTMLElement | null>) {
   const [inView, setInView] = useState(false);
@@ -110,9 +111,10 @@ const ROLES = [
 
 export default function MetricsSection() {
   const [activeRole, setActiveRole] = useState(0);
+  const isMobile = useIsMobile();
 
   return (
-    <section id="metrics" style={{ padding: '7rem 0', position: 'relative' }}>
+    <section id="metrics" style={{ padding: isMobile ? '4rem 0' : '7rem 0', position: 'relative' }}>
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -121,7 +123,7 @@ export default function MetricsSection() {
         borderBottom: '1px solid rgba(56,189,248,0.05)',
       }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', position: 'relative' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', position: 'relative' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <span className="tag tag-amber" style={{ marginBottom: '1rem', display: 'inline-flex' }}>
             Performance
@@ -143,9 +145,9 @@ export default function MetricsSection() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem',
-          marginBottom: '5rem',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+          gap: '0.875rem',
+          marginBottom: isMobile ? '3rem' : '5rem',
         }}>
           {METRICS.map((m) => (
             <div key={m.label}
@@ -189,7 +191,7 @@ export default function MetricsSection() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '0.875rem' }}>
             {ROLES.map((r, i) => (
               <div
                 key={r.role}

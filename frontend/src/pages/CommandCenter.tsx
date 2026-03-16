@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { ClinicalCard } from '../components/dashboard/ClinicalCard';
 import { MLCard } from '../components/dashboard/MLCard';
 import { MedicationCard } from '../components/dashboard/MedicationCard';
@@ -22,6 +23,7 @@ type DrilldownView = 'highRisk' | 'alerts' | 'medication' | 'operations' | 'ml' 
 export function CommandCenter() {
   const { data, loading, error, lastUpdated, latencyMs, refresh } = useCommandDashboard(DEMO_TOKEN);
   const showSkeleton = loading && !data;
+  const isMobile = useIsMobile();
   const [toastDismissed, setToastDismissed] = useState(false);
   const [activeView, setActiveView] = useState<DrilldownView>(null);
 
@@ -117,12 +119,12 @@ export function CommandCenter() {
       {showSkeleton && (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gridTemplateRows: '1fr 1fr',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gridTemplateRows: isMobile ? 'auto' : '1fr 1fr',
           gap: '1px',
           flex: 1,
           background: 'rgba(255,255,255,0.02)',
-          overflow: 'hidden',
+          overflow: isMobile ? 'auto' : 'hidden',
         }}>
           {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
         </div>
@@ -133,12 +135,12 @@ export function CommandCenter() {
           data-guide="dashboard"
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '1fr 1fr',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gridTemplateRows: isMobile ? 'auto' : '1fr 1fr',
             gap: '1px',
             flex: 1,
             background: 'rgba(255,255,255,0.02)',
-            overflow: 'hidden',
+            overflow: isMobile ? 'auto' : 'hidden',
             minHeight: 0,
           }}>
           <ClinicalCard

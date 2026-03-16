@@ -1,6 +1,7 @@
 import { useRef, type KeyboardEvent } from 'react';
 import { useAIGuide } from './useAIGuide';
 import { HighlightOverlay } from './HighlightOverlay';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 function OrbIcon({ status, color }: { status: string; color: string }) {
   if (status === 'speaking') {
@@ -182,6 +183,7 @@ function ControlButton({
 export function AIGuideWidget() {
   const guide = useAIGuide();
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
 
   const handleSend = () => {
     if (!guide.qaQuestion.trim()) return;
@@ -206,8 +208,8 @@ export function AIGuideWidget() {
 
       <div style={{
         position: 'fixed',
-        bottom: '24px',
-        right: '24px',
+        bottom: isMobile ? '16px' : '24px',
+        right: isMobile ? '12px' : '24px',
         zIndex: 9999,
         display: 'flex',
         flexDirection: 'column',
@@ -216,7 +218,8 @@ export function AIGuideWidget() {
       }}>
         {guide.isOpen && (
           <div style={{
-            width: '320px',
+            width: isMobile ? 'calc(100vw - 24px)' : '320px',
+            maxWidth: isMobile ? '360px' : undefined,
             background: '#0d1219',
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '12px',
