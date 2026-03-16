@@ -45,8 +45,13 @@ function stopKeepAlive(): void {
   }
 }
 
+function preprocessForSpeech(text: string): string {
+  return text.replace(/(\d+)\.(\d+)/g, (_, whole, frac) => `${whole} point ${frac}`);
+}
+
 function splitIntoChunks(text: string): string[] {
-  const raw = text.match(/[^.!?]+(?:[.!?]+(?:\s|$))?/g) ?? [text];
+  const processed = preprocessForSpeech(text);
+  const raw = processed.match(/[^.!?]+(?:[.!?]+(?:\s|$))?/g) ?? [processed];
   return raw.map(s => s.trim()).filter(s => s.length > 0);
 }
 
