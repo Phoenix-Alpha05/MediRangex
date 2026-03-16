@@ -21,20 +21,31 @@ export function useAIGuide() {
   const [isPaused, setIsPaused] = useState(false);
 
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const modeRef = useRef<GuideMode>(mode);
+  const isTourActiveRef = useRef(false);
+  const isPausedRef = useRef(false);
+  const isCancelledRef = useRef(false);
+
   const ttsSupported = isTTSSupported();
   const sttSupported = isSTTSupported();
 
-  const steps = mode === 'clinical' ? clinicalSteps : investorSteps;
+  useEffect(() => { modeRef.current = mode; }, [mode]);
+
+  const stepsForMode = useCallback((m: GuideMode) => m === 'clinical' ? clinicalSteps : investorSteps, []);
+  const steps = stepsForMode(mode);
   const totalSteps = steps.length;
 
   const clearHighlight = useCallback(() => {
     setHighlightTarget(null);
   }, []);
 
-  const speakText = useCallback((text: string, onDone?: () => void) => {
+  const speakStep = useCallback((text: string, onDone?: () => void) => {
     if (!ttsSupported) {
       setSubtitleText(text);
-      onDone?.();
+      setTimeout(() => {
+        setSubtitleText('');
+        onDone?.();
+      }, 100);
       return;
     }
 
@@ -42,17 +53,9 @@ export function useAIGuide() {
     setStatus('speaking');
 
     speak(text, {
-      profile: mode,
-      onWord: (word) => {
-        setSubtitleText(prev => {
-          const idx = text.indexOf(word, Math.max(0, text.length - prev.length - 10));
-          if (idx !== -1) {
-            return text.slice(Math.max(0, idx - 60), idx + word.length + 60).trim();
-          }
-          return prev;
-        });
-      },
+      profile: modeRef.current,
       onEnd: () => {
+        if (isCancelledRef.current) return;
         setStatus('idle');
         setSubtitleText('');
         clearHighlight();
@@ -65,15 +68,43 @@ export function useAIGuide() {
         onDone?.();
       },
     });
-  }, [mode, ttsSupported, clearHighlight]);
+  }, [ttsSupported, clearHighlight]);
+
+  const runTourFromStep = useCallback((stepIndex: number, stepsArr: typeof clinicalSteps, currentMode: GuideMode) => {
+    if (isCancelledRef.current) return;
+
+    if (stepIndex >= stepsArr.length) {
+      isTourActiveRef.current = false;
+      setIsTourActive(false);
+      setCurrentStepIndex(0);
+      setHighlightTarget(null);
+
+      const outro = currentMode === 'clinical'
+        ? "That completes the clinical walkthrough. You can ask me any question about the platform, or start the tour again at any time."
+        : "That concludes the investor overview. I'm happy to answer any questions about the platform, the business model, or the technology.";
+
+      speakStep(outro);
+      return;
+    }
+
+    const step = stepsArr[stepIndex];
+    setCurrentStepIndex(stepIndex);
+    setHighlightTarget(step.targetSelector ?? null);
+    setHighlightColor(step.highlightColor ?? '#38bdf8');
+
+    speakStep(step.script, () => {
+      if (isCancelledRef.current || isPausedRef.current) return;
+      runTourFromStep(stepIndex + 1, stepsArr, currentMode);
+    });
+  }, [speakStep]);
 
   const showIdlePrompt = useCallback(() => {
-    if (status !== 'idle' || isTourActive) return;
-    const prompt = mode === 'clinical'
+    if (isTourActiveRef.current) return;
+    const prompt = modeRef.current === 'clinical'
       ? "I'm here to help. Would you like a guided tour of the clinical intelligence engine, or do you have a specific question?"
       : "Ready when you are. Would you like to walk through the investor overview, or ask about a specific aspect of the platform?";
-    speakText(prompt);
-  }, [status, isTourActive, mode, speakText]);
+    speakStep(prompt);
+  }, [speakStep]);
 
   const resetIdleTimer = useCallback(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
@@ -89,81 +120,67 @@ export function useAIGuide() {
 
   const startTour = useCallback(() => {
     stopSpeaking();
+    isCancelledRef.current = false;
+    isPausedRef.current = false;
+    isTourActiveRef.current = true;
+
     setIsTourActive(true);
     setCurrentStepIndex(0);
     setQaAnswer(null);
     setIsPaused(false);
-
-    const step = steps[0];
     setHighlightTarget(null);
-    setHighlightColor(step.highlightColor ?? '#38bdf8');
 
-    const greeting = mode === 'clinical'
-      ? "Welcome. It's truly wonderful to have you here. I'm ARIA — your Adaptive Real-time Intelligence Assistant — and I must say, you've arrived at quite the right moment. Allow me to take you through MediRangeX, one of the most sophisticated real-time clinical intelligence platforms ever assembled. Shall we begin?"
-      : "Welcome, and thank you so very much for joining us today. It's a genuine pleasure to have you here. I'm ARIA — your Adaptive Real-time Intelligence Assistant. I'll be guiding you through MediRangeX — a platform that is quietly redefining what clinical intelligence looks like at enterprise scale. I think you'll find this rather illuminating.";
+    const currentMode = modeRef.current;
+    const currentSteps = stepsForMode(currentMode);
 
-    speakText(greeting, () => {
-      setHighlightTarget(step.targetSelector ?? null);
-      speakText(step.script, () => {
-        setCurrentStepIndex(1);
-      });
+    const greeting = currentMode === 'clinical'
+      ? "Welcome. I'm ARIA — your Adaptive Real-time Intelligence Assistant. Allow me to guide you through MediRangeX, a real-time clinical intelligence platform designed to surface critical decisions exactly when care teams need them. Let's begin."
+      : "Welcome, and thank you for joining us. I'm ARIA — your Adaptive Real-time Intelligence Assistant. I'll be walking you through MediRangeX — a platform redefining clinical intelligence at enterprise scale. Let's get started.";
+
+    speakStep(greeting, () => {
+      if (isCancelledRef.current) return;
+      runTourFromStep(0, currentSteps, currentMode);
     });
-  }, [mode, steps, speakText]);
-
-  const advanceStep = useCallback((index: number) => {
-    if (index >= totalSteps) {
-      setIsTourActive(false);
-      setCurrentStepIndex(0);
-      setHighlightTarget(null);
-      const outro = mode === 'clinical'
-        ? "That completes the clinical walkthrough. You can ask me any question about the platform, or start the tour again at any time."
-        : "That concludes the investor overview. I'm happy to answer any questions about the platform, the business model, or the technology.";
-      speakText(outro);
-      return;
-    }
-
-    const step = steps[index];
-    setHighlightTarget(step.targetSelector ?? null);
-    setHighlightColor(step.highlightColor ?? '#38bdf8');
-
-    speakText(step.script, () => {
-      setCurrentStepIndex(index + 1);
-    });
-  }, [steps, totalSteps, mode, speakText]);
-
-  useEffect(() => {
-    if (!isTourActive || isPaused) return;
-    if (currentStepIndex === 0) return;
-    advanceStep(currentStepIndex);
-  }, [currentStepIndex, isTourActive, isPaused, advanceStep]);
+  }, [stepsForMode, speakStep, runTourFromStep]);
 
   const pauseTour = useCallback(() => {
     if (status === 'speaking') {
       pauseSpeaking();
+      isPausedRef.current = true;
       setStatus('paused');
       setIsPaused(true);
     }
   }, [status]);
 
   const resumeTour = useCallback(() => {
-    if (isPaused) {
+    if (isPausedRef.current) {
       resumeSpeaking();
+      isPausedRef.current = false;
       setStatus('speaking');
       setIsPaused(false);
     }
-  }, [isPaused]);
+  }, []);
 
   const restartTour = useCallback(() => {
+    isCancelledRef.current = true;
     stopSpeaking();
     setIsTourActive(false);
     setCurrentStepIndex(0);
     setHighlightTarget(null);
     setQaAnswer(null);
     setIsPaused(false);
-    setTimeout(() => startTour(), 100);
+    isPausedRef.current = false;
+    isTourActiveRef.current = false;
+    setTimeout(() => {
+      isCancelledRef.current = false;
+      startTour();
+    }, 150);
   }, [startTour]);
 
   const stopTour = useCallback(() => {
+    isCancelledRef.current = true;
+    isPausedRef.current = false;
+    isTourActiveRef.current = false;
     stopSpeaking();
     setIsTourActive(false);
     setCurrentStepIndex(0);
@@ -177,25 +194,29 @@ export function useAIGuide() {
     if (!question.trim()) return;
     resetIdleTimer();
 
+    isCancelledRef.current = true;
     stopSpeaking();
+    isTourActiveRef.current = false;
     setIsTourActive(false);
     setHighlightTarget(null);
     setQaAnswer(null);
 
-    const qa = mode === 'clinical' ? clinicalQA : investorQA;
+    const qa = modeRef.current === 'clinical' ? clinicalQA : investorQA;
     const answer = findAnswer(question, qa);
 
     const response = answer
-      ?? (mode === 'clinical'
-        ? "That's a great clinical question. The platform is continuously updated to address these scenarios. I'd recommend exploring the specific panel for more detail, or consult the system documentation for deep technical specifications."
+      ?? (modeRef.current === 'clinical'
+        ? "That's a great clinical question. The platform is continuously updated to address these scenarios. I'd recommend exploring the specific panel for more detail, or consulting the system documentation for technical specifications."
         : "That's an important strategic question. The platform is designed to address exactly these considerations at enterprise scale. I'd recommend scheduling a detailed technical discussion with the team for a full answer.");
 
     setQaAnswer(response);
-    speakText(response);
-  }, [mode, resetIdleTimer, speakText]);
+    isCancelledRef.current = false;
+    speakStep(response);
+  }, [resetIdleTimer, speakStep]);
 
   const startVoiceInput = useCallback(() => {
     if (!sttSupported || isListening) return;
+    isCancelledRef.current = true;
     stopSpeaking();
     setIsListening(true);
     setStatus('listening');
@@ -205,6 +226,7 @@ export function useAIGuide() {
         setQaQuestion(transcript);
         setIsListening(false);
         setStatus('idle');
+        isCancelledRef.current = false;
         askQuestion(transcript);
       },
       () => {
@@ -221,7 +243,10 @@ export function useAIGuide() {
   }, []);
 
   const switchMode = useCallback((newMode: GuideMode) => {
-    if (newMode === mode) return;
+    if (newMode === modeRef.current) return;
+    isCancelledRef.current = true;
+    isPausedRef.current = false;
+    isTourActiveRef.current = false;
     stopSpeaking();
     setMode(newMode);
     setIsTourActive(false);
@@ -232,12 +257,17 @@ export function useAIGuide() {
     setSubtitleText('');
     setStatus('idle');
     setIsPaused(false);
-  }, [mode]);
+    setTimeout(() => { isCancelledRef.current = false; }, 50);
+  }, []);
 
   const toggleOpen = useCallback(() => {
     setIsOpen(prev => {
-      if (!prev) resetIdleTimer();
-      else {
+      if (!prev) {
+        resetIdleTimer();
+      } else {
+        isCancelledRef.current = true;
+        isPausedRef.current = false;
+        isTourActiveRef.current = false;
         stopSpeaking();
         setIsTourActive(false);
         setHighlightTarget(null);

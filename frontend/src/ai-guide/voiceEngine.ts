@@ -25,25 +25,7 @@ interface WindowWithSR {
 }
 
 let recognition: SpeechRecognitionLike | null = null;
-let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
 let isCancelled = false;
-
-function startKeepAlive(): void {
-  stopKeepAlive();
-  keepAliveInterval = setInterval(() => {
-    if ('speechSynthesis' in window && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.resume();
-    }
-  }, 10000);
-}
-
-function stopKeepAlive(): void {
-  if (keepAliveInterval !== null) {
-    clearInterval(keepAliveInterval);
-    keepAliveInterval = null;
-  }
-}
 
 function preprocessForSpeech(text: string): string {
   return text.replace(/(\d+)\.(\d+)/g, (_, whole, frac) => `${whole} point ${frac}`);
@@ -89,7 +71,6 @@ function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
 
 function speakChunks(chunks: string[], index: number, options: SpeakOptions): void {
   if (isCancelled || index >= chunks.length) {
-    stopKeepAlive();
     if (!isCancelled) options.onEnd?.();
     return;
   }
@@ -112,10 +93,7 @@ function speakChunks(chunks: string[], index: number, options: SpeakOptions): vo
   };
 
   utt.onend = () => {
-    if (isCancelled) {
-      stopKeepAlive();
-      return;
-    }
+    if (isCancelled) return;
     setTimeout(() => speakChunks(chunks, index + 1, options), 80);
   };
 
@@ -123,7 +101,6 @@ function speakChunks(chunks: string[], index: number, options: SpeakOptions): vo
     if ((e as SpeechSynthesisErrorEvent).error === 'interrupted' || (e as SpeechSynthesisErrorEvent).error === 'canceled') {
       return;
     }
-    stopKeepAlive();
     options.onError?.();
   };
 
@@ -139,7 +116,6 @@ export function speak(text: string, options: SpeakOptions): void {
   const chunks = splitIntoChunks(text);
 
   const startSpeaking = () => {
-    startKeepAlive();
     speakChunks(chunks, 0, options);
   };
 
@@ -156,7 +132,6 @@ export function speak(text: string, options: SpeakOptions): void {
 
 export function stopSpeaking(): void {
   isCancelled = true;
-  stopKeepAlive();
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
