@@ -25,6 +25,24 @@ interface WindowWithSR {
 }
 
 let recognition: SpeechRecognitionLike | null = null;
+let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
+
+function startKeepAlive(): void {
+  stopKeepAlive();
+  keepAliveInterval = setInterval(() => {
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    }
+  }, 10000);
+}
+
+function stopKeepAlive(): void {
+  if (keepAliveInterval !== null) {
+    clearInterval(keepAliveInterval);
+    keepAliveInterval = null;
+  }
+}
 
 function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices();
@@ -81,14 +99,17 @@ export function speak(text: string, options: SpeakOptions): void {
     };
 
     utt.onend = () => {
+      stopKeepAlive();
       options.onEnd?.();
     };
 
     utt.onerror = () => {
+      stopKeepAlive();
       options.onError?.();
     };
 
     window.speechSynthesis.speak(utt);
+    startKeepAlive();
   };
 
   const voices = window.speechSynthesis.getVoices();
@@ -103,6 +124,7 @@ export function speak(text: string, options: SpeakOptions): void {
 }
 
 export function stopSpeaking(): void {
+  stopKeepAlive();
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
