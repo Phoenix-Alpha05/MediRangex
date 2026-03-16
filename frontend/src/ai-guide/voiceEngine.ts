@@ -106,13 +106,17 @@ function speakChunks(chunks: string[], index: number, sessionId: number, options
 
   const chunk = chunks[index];
   const utt = new SpeechSynthesisUtterance(chunk);
-  utt.lang = 'en-GB';
   utt.rate = options.profile === 'clinical' ? 0.9 : 0.95;
   utt.pitch = 1.1;
   utt.volume = 1;
 
   const voice = pickVoice(options.profile);
-  if (voice) utt.voice = voice;
+  if (voice) {
+    utt.voice = voice;
+    utt.lang = voice.lang;
+  } else {
+    utt.lang = 'en-GB';
+  }
 
   utt.onboundary = (e) => {
     if (e.name === 'word' && options.onWord) {
