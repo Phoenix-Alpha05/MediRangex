@@ -386,7 +386,7 @@ export default function ClinicalDemoSection() {
         setIsSpeaking(true);
         setSubtitleText(outro);
         speak(outro, {
-          profile: 'investor',
+          profile: 'clinical',
           onEnd: () => {
             if (isCancelledRef.current) return;
             setIsSpeaking(false);
@@ -404,7 +404,7 @@ export default function ClinicalDemoSection() {
     setIsSpeaking(true);
 
     speak(script, {
-      profile: 'investor',
+      profile: 'clinical',
       onEnd: () => {
         if (isCancelledRef.current || !playingRef.current) return;
         setIsSpeaking(false);

@@ -67,6 +67,11 @@ function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
     'Martha',
     'Karen',
     'Moira',
+    'Samantha',
+    'Victoria',
+    'Google US English',
+    'Microsoft Zira',
+    'Microsoft Zira Desktop',
   ];
 
   for (const name of preferred) {
@@ -79,6 +84,9 @@ function pickVoice(_profile: VoiceProfile): SpeechSynthesisVoice | null {
 
   const ukAny = voices.find(v => v.lang === 'en-GB');
   if (ukAny) return ukAny;
+
+  const usFemale = voices.find(v => v.lang === 'en-US' && /female|f\b/i.test(v.name));
+  if (usFemale) return usFemale;
 
   const enFemale = voices.find(v => v.lang.startsWith('en') && /female|f\b/i.test(v.name));
   if (enFemale) return enFemale;
