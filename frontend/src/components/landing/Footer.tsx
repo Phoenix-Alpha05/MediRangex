@@ -76,6 +76,24 @@ export default function Footer() {
         </div>
 
         <div style={{
+          marginBottom: '1.25rem',
+          background: 'rgba(8,12,20,0.6)',
+          border: '1px solid rgba(148,163,184,0.07)',
+          borderRadius: '0.625rem',
+          padding: '0.875rem 1rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.625rem',
+        }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3d4f63" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '0.15rem' }}>
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p style={{ margin: 0, fontSize: '0.67rem', color: '#2d3a4a', lineHeight: 1.65 }}>
+            <strong style={{ color: '#3d4f63', fontWeight: 600 }}>Important Disclosure:</strong> MediRangeX provides status reports and decision-support recommendations based on patient conditions, guided by standard and established national and international clinical guidelines. MediRangeX does not provide medical advice of any kind. All outputs are recommendations only. The ultimate clinical decision authority rests exclusively with the treating physician and care team. Use of this platform does not constitute a physician-patient relationship.
+          </p>
+        </div>
+
+        <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

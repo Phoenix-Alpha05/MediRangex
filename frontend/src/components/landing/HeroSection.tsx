@@ -636,6 +636,31 @@ export default function HeroSection() {
         )}
       </div>
 
+      <div style={{
+        maxWidth: 1280,
+        margin: '2.5rem auto 0',
+        padding: '0 1.5rem',
+        width: '100%',
+        animation: 'fade-up 0.6s ease 0.5s both',
+      }}>
+        <div style={{
+          background: 'rgba(8,12,20,0.7)',
+          border: '1px solid rgba(148,163,184,0.08)',
+          borderRadius: '0.625rem',
+          padding: '0.75rem 1rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.625rem',
+        }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '0.1rem' }}>
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p style={{ margin: 0, fontSize: '0.67rem', color: '#3d4f63', lineHeight: 1.6 }}>
+            <strong style={{ color: '#475569', fontWeight: 600 }}>Important Disclosure:</strong> MediRangeX provides status reports and decision-support recommendations based on patient conditions, guided by standard and established national and international clinical guidelines. MediRangeX does not provide medical advice. The ultimate clinical decision authority rests exclusively with the treating physician and care team.
+          </p>
+        </div>
+      </div>
+
       <div
         style={{
           position: 'absolute',
