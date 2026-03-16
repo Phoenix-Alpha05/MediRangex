@@ -366,28 +366,35 @@ export default function ClinicalDemoSection() {
   const ttsSupported = isTTSSupported();
   const navigate = useNavigate();
   const playingRef = useRef(false);
+  const isCancelledRef = useRef(false);
+  const runDemoStepRef = useRef<(index: number) => void>(() => {});
 
   const step = STEPS[currentStep];
 
-  const finishDemo = useCallback(() => {
-    setPlaying(false);
-    playingRef.current = false;
-    setShowImpact(true);
+  runDemoStepRef.current = (index: number) => {
+    if (isCancelledRef.current || !playingRef.current) return;
 
-    if (ttsSupported) {
-      const outro = 'Patient stabilized. What you have just witnessed is the standard of care that MediRangeX makes possible — earlier detection, safer therapy, and coordinated operations, all in one platform. Important disclosure: all outputs shown represent status reports guided by standard and established national and international clinical guidelines. MediRangeX does not provide medical advice. Every recommendation is a decision-support signal only. The ultimate clinical authority rests entirely with the treating physician and care team.';
-      setIsSpeaking(true);
-      setSubtitleText(outro);
-      speak(outro, {
-        profile: 'investor',
-        onEnd: () => { setIsSpeaking(false); setSubtitleText(''); },
-        onError: () => { setIsSpeaking(false); setSubtitleText(''); },
-      });
+    if (index >= STEPS.length) {
+      setPlaying(false);
+      playingRef.current = false;
+      setShowImpact(true);
+
+      if (ttsSupported) {
+        const outro = 'Patient stabilized. What you have just witnessed is the standard of care that MediRangeX makes possible — earlier detection, safer therapy, and coordinated operations, all in one platform. Important disclosure: all outputs shown represent status reports guided by standard and established national and international clinical guidelines. MediRangeX does not provide medical advice. Every recommendation is a decision-support signal only. The ultimate clinical authority rests entirely with the treating physician and care team.';
+        setIsSpeaking(true);
+        setSubtitleText(outro);
+        speak(outro, {
+          profile: 'investor',
+          onEnd: () => {
+            if (isCancelledRef.current) return;
+            setIsSpeaking(false);
+            setSubtitleText('');
+          },
+          onError: () => { setIsSpeaking(false); setSubtitleText(''); },
+        });
+      }
+      return;
     }
-  }, [ttsSupported]);
-
-  const speakStep = useCallback((index: number) => {
-    if (!playingRef.current) return;
 
     setCurrentStep(index);
     const script = STEPS[index].voiceScript;
@@ -397,40 +404,34 @@ export default function ClinicalDemoSection() {
     speak(script, {
       profile: 'investor',
       onEnd: () => {
+        if (isCancelledRef.current || !playingRef.current) return;
         setIsSpeaking(false);
         setSubtitleText('');
-        if (!playingRef.current) return;
-        const next = index + 1;
-        if (next >= STEPS.length) {
-          finishDemo();
-        } else {
-          setTimeout(() => speakStep(next), 450);
-        }
+        setTimeout(() => runDemoStepRef.current(index + 1), 450);
       },
       onError: () => {
+        if (isCancelledRef.current || !playingRef.current) return;
         setIsSpeaking(false);
         setSubtitleText('');
-        if (!playingRef.current) return;
-        const next = index + 1;
-        if (next >= STEPS.length) {
-          finishDemo();
-        } else {
-          setTimeout(() => speakStep(next), 450);
-        }
+        setTimeout(() => runDemoStepRef.current(index + 1), 450);
       },
     });
-  }, [finishDemo]);
+  };
+
+  const runDemoStep = useCallback((index: number) => runDemoStepRef.current(index), []);
 
   const startPlay = useCallback(() => {
+    isCancelledRef.current = false;
     setPlaying(true);
     setShowImpact(false);
     playingRef.current = true;
 
     if (voiceEnabled && ttsSupported) {
-      speakStep(currentStep);
+      runDemoStep(currentStep);
     } else {
       let s = currentStep;
       const interval = setInterval(() => {
+        if (isCancelledRef.current) { clearInterval(interval); return; }
         s += 1;
         if (s >= STEPS.length) {
           clearInterval(interval);
@@ -442,9 +443,10 @@ export default function ClinicalDemoSection() {
         setCurrentStep(s);
       }, 3000);
     }
-  }, [currentStep, voiceEnabled, ttsSupported, speakStep]);
+  }, [currentStep, voiceEnabled, ttsSupported, runDemoStep]);
 
   const stopPlay = useCallback(() => {
+    isCancelledRef.current = true;
     stopSpeaking();
     playingRef.current = false;
     setPlaying(false);
@@ -473,6 +475,7 @@ export default function ClinicalDemoSection() {
 
   useEffect(() => {
     return () => {
+      isCancelledRef.current = true;
       stopSpeaking();
       playingRef.current = false;
     };
