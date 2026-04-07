@@ -1,5 +1,3 @@
-# MediRangex
-
 # MediRangex — AI Clinical Intelligence Platform
 
 > **Production-grade AI platform unifying predictive analytics, medication intelligence, and operational forecasting across multi-location hospital networks.**
