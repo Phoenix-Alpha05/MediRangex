@@ -1,6 +1,6 @@
 # MediRangex — AI Clinical Intelligence Platform
 
-> **Production-grade AI platform unifying predictive analytics, medication intelligence, and operational forecasting across multi-location hospital networks.**
+Production-grade AI platform unifying predictive analytics, medication intelligence, and operational forecasting across multi-location hospital networks.
 
 🔗 **Live Demo:** [medirangex.bolt.host](https://medirangex.bolt.host)
 
@@ -40,31 +40,25 @@ Built and deployed across **5+ hospital branches** at Andhra Hospitals Group, Me
 | **Frontend** | TypeScript, React, Vite |
 | **Backend** | Python, FastAPI |
 | **AI / ML** | LangChain, LlamaIndex, RAG, Gradient Boosting, Scikit-learn |
-| **Database** | Supabase (PostgreSQL) |
-| **Migrations** | Alembic |
-| **Infra** | Docker, Docker Compose |
-| **Auth** | Supabase Auth with RBAC |
+| **Database** | Supabase (PostgreSQL), Vector Storage |
+| **Deployment** | Docker, Docker Compose |
 
 ---
 
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                   Frontend (React/TS)                │
-│        Clinical Dashboards · Analytics UI            │
-└────────────────────┬────────────────────────────────┘
-                     │ REST API
-┌────────────────────▼────────────────────────────────┐
-│               Backend (FastAPI / Python)             │
-│   ML Pipelines · LLM Orchestration · RAG Engine      │
-└──────┬──────────────────────────┬───────────────────┘
-       │                          │
-┌──────▼──────┐         ┌─────────▼──────────┐
-│  Supabase   │         │   AI / ML Models    │
-│ (PostgreSQL)│         │ LangChain·LlamaIndex│
-│    + Auth   │         │ Gradient Boosting   │
-└─────────────┘         └────────────────────┘
+Frontend (React + TypeScript)
+    ↓
+API Gateway (FastAPI)
+    ↓
+┌─────────────────┬─────────────────┬──────────────────┐
+│   ML Pipeline   │  RAG Pipeline   │  Data Pipeline   │
+├─────────────────┼─────────────────┼──────────────────┤
+│ Scikit-learn    │ LangChain       │ PostgreSQL       │
+│ XGBoost         │ LlamaIndex      │ Supabase         │
+│ Prophet         │ Vector DB       │ Alembic          │
+└─────────────────┴─────────────────┴──────────────────┘
 ```
 
 ---
@@ -72,10 +66,9 @@ Built and deployed across **5+ hospital branches** at Andhra Hospitals Group, Me
 ## Getting Started
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.11+
 - Node.js 18+
 - Docker & Docker Compose
-- Supabase account (for managed DB + auth)
 
 ### 1. Clone the repository
 ```bash
@@ -86,7 +79,7 @@ cd MediRangex
 ### 2. Set up environment variables
 ```bash
 cp .env.example .env
-# Fill in your Supabase URL, Supabase anon key, and OpenAI/LLM API key
+# Edit .env with your configuration
 ```
 
 ### 3. Run with Docker (recommended)
@@ -99,13 +92,11 @@ docker-compose up --build
 **Backend:**
 ```bash
 pip install -r requirements.txt
-alembic upgrade head
-python main.py
+uvicorn main:app --reload
 ```
 
 **Frontend:**
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
@@ -116,47 +107,35 @@ npm run dev
 
 ```
 MediRangex/
-├── app/                  # FastAPI backend — routes, services, ML models
-├── frontend/             # React + TypeScript UI
-├── scripts/              # Data ingestion and automation scripts
-├── alembic/              # Database migration files
-├── supabase/             # Supabase config and edge functions
-├── data/knowledge/       # RAG knowledge base documents
-├── main.py               # Application entry point
-├── Dockerfile
-├── docker-compose.yml
-└── requirements.txt
+├── app/              # Backend application
+├── frontend/         # React frontend
+├── data/knowledge/   # RAG knowledge base
+├── scripts/          # Utility scripts
+├── alembic/          # Database migrations
+└── supabase/         # Supabase configurations
 ```
 
 ---
 
 ## Business Impact
 
-| Metric | Result |
-|---|---|
-| Manual research effort | ↓ 40% via LLM-RAG automation |
-| Clinical response time | Reduced via early deterioration detection |
-| Hospital branches covered | 5+ locations |
-| Stakeholders | Clinical staff + Operations + Leadership |
-| Deployment status | Production — daily active use |
+- **40% reduction** in clinical research manual effort
+- **Early detection** of patient deterioration events
+- **Real-time visibility** across 5+ hospital branches
+- **Proactive resource planning** based on predictive forecasts
+- **Compliance automation** for regulatory reporting
 
 ---
 
 ## Related Projects
 
-- **[AccrediX](https://accredix.lovable.app)** — NABH Hospital Accreditation Digital Twin Platform (639 Objective Elements, multi-tenant RBAC, stochastic anti-gaming audit engine)
-- **[Energy Market Intelligence AI Platform](https://energymarketintelligenceaiplatform.lovable.app)** — Gradient Boosting + LLM research intelligence for European gas markets
+- [AccrediX](https://accredix.lovable.app/) — Hospital Accreditation Management Platform
+- [Energy Market Intelligence AI Platform](https://energymarketintelligenceaiplatform.lovable.app/)
 
 ---
 
 ## Author
 
-**Narendra Ganta**
-AI Product Manager | Applied AI & Decision Intelligence Systems
-
-📧 narendra.g.work@gmail.com
+**Dr. Narendra**  
+📧 [narendra.g.work@gmail.com](mailto:narendra.g.work@gmail.com)  
 🔗 [linkedin.com/in/drnarendra](https://www.linkedin.com/in/drnarendra/)
-
----
-
-*Built with Python · TypeScript · LangChain · Supabase · Docker*
