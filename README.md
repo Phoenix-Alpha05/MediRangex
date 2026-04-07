@@ -1,141 +1,143 @@
-# MediRangex — AI Clinical Intelligence Platform
+# MediRangeX — AI Clinical Intelligence Platform
 
-Production-grade AI platform unifying predictive analytics, medication intelligence, and operational forecasting across multi-location hospital networks.
+> Production-grade clinical decision support system combining predictive ML models, 
+> NLP-powered medication intelligence, and operational forecasting across a 
+> multi-location hospital network.
 
-🔗 **Live Demo:** [medirangex.bolt.host](https://medirangex.bolt.host)
-
----
-
-## What is MediRangex?
-
-MediRangex is an end-to-end AI Clinical Intelligence Platform built for multi-specialty hospital networks. It transforms raw clinical and operational data into real-time decision intelligence — enabling clinicians and hospital leadership to act proactively rather than reactively.
-
-Built and deployed across **5+ hospital branches** at Andhra Hospitals Group, MediRangex is used daily by clinical and operations leadership for resource planning, patient safety, and compliance decisions.
+**Live Platform:** [medirangex.bolt.host](https://medirangex.bolt.host)
 
 ---
 
-## Key Features
+## What This Is
 
-### 🏥 Clinical Intelligence
-- **Patient Deterioration Detection** — Early warning models flagging at-risk patients before critical events, reducing clinical response times
-- **ICU Capacity Forecasting** — Predictive occupancy models enabling proactive bed and staff allocation
-- **Medication Safety Intelligence** — Automated drug interaction screening and dosage anomaly detection
+MediRangeX is a full-stack AI platform built for real clinical operations at Andhra Hospitals Group (5+ locations). It replaces manual, intuition-driven clinical workflows with ML-powered decision support — adopted by clinical and operations leadership for daily use.
 
-### 📊 Operational Analytics
-- **Multi-branch Dashboards** — Unified operational visibility across 5+ hospital locations
-- **Resource & Performance Forecasting** — Demand prediction for staffing, equipment, and supplies
-- **Compliance Monitoring** — Real-time tracking of regulatory and accreditation KPIs
+This is not a demo or tutorial project. It runs in production, handles real operational data, and was built iteratively with clinical stakeholders over 2+ years.
 
-### 🤖 AI & Automation
-- **LLM-powered Clinical Research** — RAG-based automation reducing manual research effort by 40%
-- **ML Forecasting Pipelines** — Gradient Boosting and time-series models integrated into clinical workflows
-- **Automated Reporting** — Scheduled intelligence reports pushed to leadership dashboards
+---
+
+## Core ML Capabilities
+
+### Patient Risk Stratification
+- Classification pipeline predicting patient deterioration risk
+- Features engineered from vitals trends, lab results, medication history, and admission patterns
+- Outputs risk scores consumed by clinical dashboards for proactive intervention
+
+### ICU Capacity Forecasting
+- Time-series demand forecasting for ICU and high-dependency beds
+- Multi-step ahead predictions enabling proactive resource allocation
+- Reduces reactive scrambling for critical care capacity
+
+### Medication Safety Intelligence
+- NLP pipeline over clinical notes and prescription data
+- Flags high-risk drug combinations and dosing anomalies
+- Transformer-based embeddings for clinical text understanding
+
+### Operational Analytics
+- Cross-branch KPI dashboards adopted by hospital leadership
+- Model output monitoring integrated with operational metrics
+- Real-time visibility across 5+ hospital locations
+
+---
+
+## System Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│              React Frontend                     │
+│      (TypeScript · Vite · Tailwind)            │
+└────────────────────┬────────────────────────────┘
+                     │ REST API
+┌────────────────────▼────────────────────────────┐
+│          FastAPI Backend (main.py)              │
+│  • Structured logging middleware                │
+│  • Error handling middleware                    │
+│  • Knowledge Bank loader (clinical AI context)  │
+│  • Alembic DB migrations                        │
+└──────┬──────────────────┬───────────────────────┘
+       │                  │
+┌──────▼──────┐    ┌──────▼──────────────────────┐
+│  Supabase   │    │       ML / AI Layer         │
+│ (Postgres)  │    │  • Scikit-learn pipelines   │
+│             │    │  • Transformer embeddings   │
+│             │    │  • Knowledge bank (RAG)     │
+└─────────────┘    └─────────────────────────────┘
+```
 
 ---
 
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| **Frontend** | TypeScript, React, Vite |
-| **Backend** | Python, FastAPI |
-| **AI / ML** | LangChain, LlamaIndex, RAG, Gradient Boosting, Scikit-learn |
-| **Database** | Supabase (PostgreSQL), Vector Storage |
-| **Deployment** | Docker, Docker Compose |
+|-------|------------|
+| ML & Modeling | Scikit-learn, Transformer embeddings, time-series forecasting |
+| NLP | Clinical text pipelines, embedding-based similarity |
+| Backend | FastAPI, Python, Alembic, SQLAlchemy |
+| Frontend | TypeScript, React, Vite |
+| Database | Supabase (PostgreSQL) |
+| Infrastructure | Docker, docker-compose |
+| Observability | Structured logging (request tracing, error middleware) |
 
 ---
 
-## Architecture Overview
+## Repository Structure
 
 ```
-Frontend (React + TypeScript)
-    ↓
-API Gateway (FastAPI)
-    ↓
-┌─────────────────┬─────────────────┬──────────────────┐
-│   ML Pipeline   │  RAG Pipeline   │  Data Pipeline   │
-├─────────────────┼─────────────────┼──────────────────┤
-│ Scikit-learn    │ LangChain       │ PostgreSQL       │
-│ XGBoost         │ LlamaIndex      │ Supabase         │
-│ Prophet         │ Vector DB       │ Alembic          │
-└─────────────────┴─────────────────┴──────────────────┘
+├── main.py              # FastAPI app entry — middleware, lifespan, routing
+├── app/
+│   ├── api/             # Route handlers
+│   ├── core/            # Config, logging, middleware
+│   ├── db/              # Session management
+│   ├── knowledge_bank/  # Clinical AI knowledge loader (RAG layer)
+│   └── schemas/         # Pydantic models
+├── alembic/             # DB migrations
+├── scripts/             # Seed data, utilities
+├── frontend/            # React/TS frontend
+├── Dockerfile
+└── docker-compose.yml
 ```
 
 ---
 
-## Getting Started
+## Key Engineering Decisions
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+
-- Docker & Docker Compose
+**Knowledge Bank as RAG Layer** — Clinical context (drug interactions, protocol guidelines, risk thresholds) is loaded at startup as a structured knowledge bank, enabling the API to ground AI responses in validated clinical sources rather than raw LLM outputs.
 
-### 1. Clone the repository
+**Middleware-first observability** — Every request is logged with structured JSON (request ID, latency, endpoint, status). Errors are intercepted before reaching the client, enabling clean separation of failure modes.
+
+**Alembic migrations** — Schema changes are versioned and reproducible, not ad-hoc. Critical for a production system where data integrity has clinical consequences.
+
+**Docker-first deployment** — Full stack runs via `docker-compose up`, making environment parity between development and production explicit.
+
+---
+
+## Results (Production)
+
+- Patient deterioration detection adopted by ICU clinical team for proactive intervention
+- ICU capacity forecasting reduced reactive resource scrambling across high-dependency units  
+- Medication safety NLP flagging integrated into prescription review workflow
+- Operational dashboards used daily by leadership across 5+ hospital branches
+
+---
+
+## Local Setup
+
 ```bash
+# Clone and configure
 git clone https://github.com/Phoenix-Alpha05/MediRangex.git
 cd MediRangex
-```
+cp .env.example .env  # add your API keys
 
-### 2. Set up environment variables
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-### 3. Run with Docker (recommended)
-```bash
+# Run with Docker
 docker-compose up --build
+
+# API docs available at
+http://localhost:8000/docs
 ```
-
-### 4. Or run manually
-
-**Backend:**
-```bash
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-**Frontend:**
-```bash
-npm install
-npm run dev
-```
-
----
-
-## Project Structure
-
-```
-MediRangex/
-├── app/              # Backend application
-├── frontend/         # React frontend
-├── data/knowledge/   # RAG knowledge base
-├── scripts/          # Utility scripts
-├── alembic/          # Database migrations
-└── supabase/         # Supabase configurations
-```
-
----
-
-## Business Impact
-
-- **40% reduction** in clinical research manual effort
-- **Early detection** of patient deterioration events
-- **Real-time visibility** across 5+ hospital branches
-- **Proactive resource planning** based on predictive forecasts
-- **Compliance automation** for regulatory reporting
-
----
-
-## Related Projects
-
-- [AccrediX](https://accredix.lovable.app/) — Hospital Accreditation Management Platform
-- [Energy Market Intelligence AI Platform](https://energymarketintelligenceaiplatform.lovable.app/)
 
 ---
 
 ## Author
 
-**Dr. Narendra**  
-📧 [narendra.g.work@gmail.com](mailto:narendra.g.work@gmail.com)  
-🔗 [linkedin.com/in/drnarendra](https://www.linkedin.com/in/drnarendra/)
+**Narendra Ganta** — Data Scientist & AI Systems Builder  
+[linkedin.com/in/drnarendra](https://www.linkedin.com/in/drnarendra/) · [medirangex.bolt.host](https://medirangex.bolt.host)
